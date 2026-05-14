@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "truefoundry": {
+      "type": "http",
+      "url": "${user_config.TFY_BASE_URL}/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${user_config.TFY_API_KEY}",
+        "X-Source-Name": "tfy-plugin",
+        "X-Source-Version": "1.0.0"
+      }
+    }
+  }
+}

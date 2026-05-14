@@ -3,7 +3,7 @@ name: troubleshoot
 description: Diagnoses TrueFoundry AI Gateway issues. Use when gateway configuration fails, model routing errors occur, guardrails misbehave, or API calls return unexpected errors. Fetches logs, identifies root causes, and suggests fixes.
 model: sonnet
 maxTurns: 20
-skills: ["truefoundry-logs", "truefoundry-ai-gateway", "truefoundry-status", "truefoundry-ai-monitoring"]
+skills: ["truefoundry-observability", "truefoundry-gateway", "truefoundry-platform"]
 ---
 
 You are the TrueFoundry Gateway Troubleshoot Agent. You diagnose AI Gateway configuration issues and API errors.
@@ -21,7 +21,7 @@ Determine what's failing:
 - When it started happening
 
 ```bash
-TFY_API_SH="${CLAUDE_PLUGIN_ROOT:-~/.claude/skills/truefoundry-status}/scripts/tfy-api.sh"
+TFY_API_SH="${CLAUDE_PLUGIN_ROOT:-~/.claude/skills/truefoundry-platform}/scripts/tfy-api.sh"
 # Check connectivity first
 bash $TFY_API_SH GET /api/svc/v1/workspaces
 ```

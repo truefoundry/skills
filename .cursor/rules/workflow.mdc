@@ -24,18 +24,15 @@ bash scripts/tfy-api.sh GET /api/svc/v1/workspaces
 ```
 
 ### 3. Analyze User Intent
-- Model routing / virtual models -> ai-gateway skill
-- Guardrails (PII, content moderation, prompt injection) -> guardrails skill
-- MCP server registration -> mcp-servers skill
-- Prompt management -> prompts skill
-- AI agents configuration -> agents skill
-- Rate limiting / budget controls -> ai-gateway skill
-- Monitoring / observability -> ai-monitoring skill
-- Platform integrations -> integrations skill
+- Model routing / virtual models / rate limiting / budget / guardrails / integrations / monitoring -> gateway skill
+- Platform setup / status / workspaces / access control / tokens -> platform skill
+- Logs / tracing / instrumentation -> observability skill
+- MCP servers / secrets / docs -> tools skill
+- Prompts / agent registry -> agents skill
 
 ### 4. Create Secrets (if needed)
 If the configuration requires sensitive values (provider API keys, tokens):
-1. Create a TrueFoundry secret group
+1. Create a TrueFoundry secret group (tools skill)
 2. Add each secret
 3. Use `tfy-secret://tenant:group:key` references
 
@@ -53,7 +50,7 @@ Apply the configuration, then verify:
 | `403 Forbidden` | Insufficient permissions | Check token scope and workspace access |
 | `404 Not Found` | Wrong TFY_BASE_URL or resource doesn't exist | Verify URL and resource name |
 | `429 Too Many Requests` | Rate limit exceeded | Check VAT rate limit config, increase limits or add backoff |
-| `Model not found` | Model not configured in gateway | Add model route via ai-gateway skill |
+| `Model not found` | Model not configured in gateway | Add model route via gateway skill |
 | `Guardrail blocked` | Content failed guardrail check | Review guardrail rules, check enforcing strategy |
 | `MCP server unreachable` | Endpoint down or misconfigured | Verify MCP server URL and connectivity |
 | `Connection refused` | TrueFoundry platform unreachable | Check network/VPN, verify TFY_BASE_URL |

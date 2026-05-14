@@ -5,19 +5,19 @@
     "url": "https://github.com/truefoundry"
   },
   "metadata": {
-    "description": "TrueFoundry AI Gateway plugin — unified LLM access with observability, cost tracking, and safety guardrails",
+    "description": "TrueFoundry AI Gateway plugin for Cursor — observability, cost tracking, and model routing for AI coding agents",
     "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "truefoundry",
-      "description": "TrueFoundry AI Gateway plugin with skills for gateway setup, codebase migration, observability, onboarding, and platform management.",
+      "description": "TrueFoundry AI Gateway plugin with skills for gateway setup, codebase migration, observability, and platform management.",
       "source": "./",
       "author": { "name": "TrueFoundry", "url": "https://truefoundry.com" },
       "homepage": "https://github.com/truefoundry/skills",
       "repository": "https://github.com/truefoundry/skills",
       "license": "MIT",
-      "keywords": ["truefoundry", "ai-gateway", "llm", "observability", "mcp", "codebase-scanner"]
+      "keywords": ["truefoundry", "ai-gateway", "llm", "observability", "mcp"]
     }
   ]
 }

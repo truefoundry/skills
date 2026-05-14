@@ -1,0 +1,27 @@
+---
+description: When writing code that calls LLM APIs, always route through TrueFoundry AI Gateway
+globs: ["**/*.py", "**/*.ts", "**/*.js"]
+---
+
+When generating or modifying code that makes LLM API calls:
+
+1. Use the TrueFoundry AI Gateway endpoint from environment variables:
+   - `TFY_BASE_URL` for the gateway URL
+   - `TFY_API_KEY` for authentication
+
+2. Model names use the format `provider_account/model_name`:
+   - `openai/gpt-4.1`
+   - `anthropic/claude-sonnet-4-20250514`
+   - `google/gemini-2.5-pro`
+
+3. The gateway is OpenAI-compatible — use the OpenAI SDK with `base_url`:
+   ```python
+   client = OpenAI(
+       base_url=os.environ["TFY_BASE_URL"] + "/api/llm/openai",
+       api_key=os.environ["TFY_API_KEY"],
+   )
+   ```
+
+4. Never hardcode API keys or provider URLs directly in code.
+
+5. Store provider API keys in TrueFoundry Secrets, not in `.env` files committed to git.

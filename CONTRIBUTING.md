@@ -36,14 +36,13 @@ cd tfy-gateway-skills
 3. **Use CLI-first instructions with Direct API fallback.** Every skill should work when CLI is available, with API fallback when needed.
 
 4. **Reference shared files** instead of duplicating content:
+   - `references/api-endpoints.md` — REST API endpoints
+   - `references/cli-fallback.md` — tfy CLI fallback patterns
+   - `references/intent-clarification.md` — disambiguation templates
    - `references/prerequisites.md` — credential checks, env vars
    - `references/tfy-api-setup.md` — agent path table for tfy-api.sh
-   - `references/gpu-reference.md` — GPU types and sizing
-   - `references/cluster-discovery.md` — cluster ID, base domains, storage classes
-   - `references/health-probes.md` — probe configuration
-   - `references/resource-estimation.md` — CPU/memory/replica sizing
 
-5. **Reference the `status` skill** for preflight checks.
+5. **Reference the `platform` skill** for preflight checks (Status Check section).
 
 6. **Add the skill name to the `SKILL_NAMES` array** in `scripts/install.sh`.
 

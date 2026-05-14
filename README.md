@@ -29,7 +29,7 @@ Install from the Claude Code plugin marketplace:
 ```
 
 What you get:
-- 16 skills loaded automatically
+- 5 skills loaded automatically
 - 2 specialized agents (gateway configurator, troubleshoot)
 - 3 hooks enforcing safe gateway workflows
 - Automatic credential checks on session start
@@ -59,7 +59,7 @@ npx skills add truefoundry/tfy-gateway-skills -g -a cursor -s '*' -y
 ```
 
 What you get:
-- 16 skills as context rules
+- 5 skills as context rules
 - No hook enforcement (Cursor does not support hooks)
 - Skills provide guidance but cannot block unsafe operations
 
@@ -90,14 +90,17 @@ Just ask your agent in plain English:
 
 ## What's Included
 
-### 16 Skills
+### 5 Skills
 
-| Category | Skills |
-|----------|--------|
-| **Gateway** | [agents](skills/agents), [ai-gateway](skills/ai-gateway), [ai-monitoring](skills/ai-monitoring), [guardrails](skills/guardrails), [integrations](skills/integrations), [mcp-servers](skills/mcp-servers), [prompts](skills/prompts) |
-| **Platform** | [access-control](skills/access-control), [access-tokens](skills/access-tokens), [docs](skills/docs), [logs](skills/logs), [onboarding](skills/onboarding), [secrets](skills/secrets), [status](skills/status), [tracing](skills/tracing), [workspaces](skills/workspaces) |
+| Skill | Description |
+|-------|-------------|
+| [gateway](skills/gateway) | AI Gateway configuration: models, providers, guardrails, rate limiting, budget controls, routing, and monitoring |
+| [platform](skills/platform) | Platform setup: status checks, onboarding, workspaces, access control, and token management |
+| [observability](skills/observability) | Application logs and OpenTelemetry tracing instrumentation |
+| [tools](skills/tools) | Infrastructure: MCP server registration, secrets management, and documentation |
+| [agents](skills/agents) | Prompt registry and AI agent management |
 
-Installed skill names are namespaced as `truefoundry-<skill>` (e.g., `truefoundry-ai-gateway`).
+Installed skill names are namespaced as `truefoundry-<skill>` (e.g., `truefoundry-gateway`).
 
 ### Plugin Hooks (Claude Code and Codex)
 
@@ -125,7 +128,7 @@ Installed skill names are namespaced as `truefoundry-<skill>` (e.g., `truefoundr
 
 | Feature | Claude Code | Codex CLI | Cursor | Standalone Skills |
 |---------|:-----------:|:---------:|:------:|:-----------------:|
-| 16 skills | yes | yes | yes | yes |
+| 5 skills | yes | yes | yes | yes |
 | Hook enforcement | yes | yes | no | no |
 | Auto credential check | yes | yes | no | no |
 | Delete blocking | yes | yes | no | no |
@@ -153,10 +156,12 @@ tfy-gateway-skills/
   skills/
     _shared/               # Canonical copies of shared scripts and references
       scripts/             # tfy-api.sh, tfy-version.sh
-      references/          # 13 shared reference docs
-    ai-gateway/SKILL.md    # One directory per skill
-    guardrails/SKILL.md
-    ...
+      references/          # 5 shared reference docs
+    gateway/SKILL.md       # AI Gateway config, providers, guardrails, monitoring
+    platform/SKILL.md      # Status, onboarding, workspaces, access control
+    observability/SKILL.md # Logs and tracing
+    tools/SKILL.md         # MCP servers, secrets, docs
+    agents/SKILL.md        # Prompts and agent registry
   scripts/                 # Dev tooling (lint, validate, sync, install)
 ```
 
