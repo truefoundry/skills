@@ -5,19 +5,19 @@ One command. Works with Claude Code, Cursor, Codex, Windsurf, Cline, Roo Code, a
 ## Quickest path
 
 ```bash
-npx skills add truefoundry/tfy-gateway-skills -s onboard
+npx skills add truefoundry/skills -s onboard
 ```
 
 This installs only the onboarding skill. To install all TrueFoundry skills (gateway config, observability, platform admin, etc.):
 
 ```bash
-npx skills add truefoundry/tfy-gateway-skills --all
+npx skills add truefoundry/skills --all
 ```
 
 ## Claude Code (plugin install)
 
 ```bash
-/install-plugin truefoundry/tfy-gateway-skills
+/install-plugin truefoundry/skills
 ```
 
 This loads all skills + enforcement hooks (secret scanning, delete blocking, auto-approve for API calls).
@@ -25,13 +25,13 @@ This loads all skills + enforcement hooks (secret scanning, delete blocking, aut
 ## Cursor
 
 ```bash
-npx skills add truefoundry/tfy-gateway-skills -g -a cursor -s onboard -y
+npx skills add truefoundry/skills -g -a cursor -s onboard -y
 ```
 
 ## Codex CLI
 
 ```bash
-npx skills add truefoundry/tfy-gateway-skills -g -a codex -s onboard -y
+npx skills add truefoundry/skills -g -a codex -s onboard -y
 ```
 
 ## Manual (any agent)

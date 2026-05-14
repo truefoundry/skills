@@ -5,19 +5,19 @@ Scan your codebase for all LLM calls and migrate them to route through TrueFound
 ## Quickest path
 
 ```bash
-npx skills add truefoundry/tfy-gateway-skills -s codebase-scanner
+npx skills add truefoundry/skills -s codebase-scanner
 ```
 
 This installs only the codebase scanner skill. To install all TrueFoundry skills:
 
 ```bash
-npx skills add truefoundry/tfy-gateway-skills --all
+npx skills add truefoundry/skills --all
 ```
 
 ## Claude Code (plugin install)
 
 ```bash
-/install-plugin truefoundry/tfy-gateway-skills
+/install-plugin truefoundry/skills
 ```
 
 This loads all skills including the codebase scanner.
@@ -25,7 +25,7 @@ This loads all skills including the codebase scanner.
 ## Cursor
 
 ```bash
-npx skills add truefoundry/tfy-gateway-skills -g -a cursor -s codebase-scanner -y
+npx skills add truefoundry/skills -g -a cursor -s codebase-scanner -y
 ```
 
 ## Manual (any agent)

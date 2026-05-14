@@ -533,7 +533,7 @@ What I can do next:
   - Set up a virtual model (load balance across providers, auto-fallback)
   - Add guardrails (PII filtering, prompt injection detection)
   - Configure budget alerts or rate limits
-  - Install the full TrueFoundry skills suite: npx skills add truefoundry/tfy-gateway-skills --all
+  - Install the full TrueFoundry skills suite: npx skills add truefoundry/skills -s '*' -y
 ```
 
 ---
