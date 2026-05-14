@@ -108,6 +108,6 @@ jobs:
           expected_count=$(find "$PWD/skills" -mindepth 1 -maxdepth 1 -type d -not -name '_*' | wc -l | tr -d ' ')
           test "$skill_count" = "$expected_count"
 
-          test -L "$target_dir/truefoundry-status/scripts"
-          test -L "$target_dir/truefoundry-status/references"
+          test -L "$target_dir/truefoundry-platform/scripts"
+          test -L "$target_dir/truefoundry-platform/references"
           test -x "$target_dir/_shared/scripts/tfy-api.sh"
