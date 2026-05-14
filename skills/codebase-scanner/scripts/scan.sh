@@ -17,6 +17,11 @@ for arg in "$@"; do
   esac
 done
 
+if [ "$OUTPUT_FORMAT" = "json" ]; then
+  echo "Error: --json output is not implemented yet; use text output." >&2
+  exit 2
+fi
+
 # Validate target
 if [ ! -d "$TARGET_DIR" ]; then
   echo "Error: Directory '$TARGET_DIR' does not exist" >&2

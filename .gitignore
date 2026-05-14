@@ -36,6 +36,7 @@ __pycache__/
 .vibe/
 .windsurf/
 .zencoder/
+/AGENTS.md
 /CLAUDE.md
 /claude.md
 skills-lock.json

@@ -1,23 +1,29 @@
-## What changed?
+## Summary
 
 <!-- One or two sentences. What did you do and why? -->
 
-## Before / After
+## Affected areas
 
-<!-- Show proof that your change works. Pick what fits: -->
-<!-- - Screenshots or terminal output -->
-<!-- - Agent conversation showing the skill working -->
-<!-- - Test results (validate-skills, shellcheck, etc.) -->
+- [ ] Skills or shared references
+- [ ] Scripts, hooks, or MCP config
+- [ ] Plugin manifests or marketplace metadata
+- [ ] GitHub templates or CI
+- [ ] Documentation only
+- [ ] Local/generated artifacts only
 
-**Before:**
+## Validation
 
+<!-- Check only what applies. Paste any relevant output in the PR body. -->
 
-**After:**
-
-
-## Checklist
-
-- [ ] Tested locally with `./scripts/install.sh`
 - [ ] Ran `./scripts/validate-skills.sh`
-- [ ] No hardcoded credentials or private URLs
+- [ ] Ran `./scripts/validate-skill-security.sh`
+- [ ] Ran `./scripts/test-tfy-api.sh`
+- [ ] Ran `shellcheck scripts/*.sh hooks/auto-approve-tfy-api.sh skills/_shared/scripts/*.sh plugin-scripts/*.sh` if shell scripts changed
+- [ ] Tested locally with `./scripts/install.sh` if install behavior changed
 - [ ] Ran `./scripts/sync-shared.sh` (if shared files were edited)
+
+## Safety checklist
+
+- [ ] No hardcoded credentials, API keys, or private URLs
+- [ ] No generated local agent install artifacts committed
+- [ ] No root `AGENTS.md`, `CLAUDE.md`, or `claude.md` files reintroduced

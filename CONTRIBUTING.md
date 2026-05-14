@@ -131,5 +131,5 @@ Before submitting a PR:
 ## Questions?
 
 - Open an issue at https://github.com/truefoundry/skills/issues
-- See [AGENTS.md](AGENTS.md) for agent-specific documentation
+- See [README.md](README.md) for plugin layout and agent-specific install notes
 - See [SUPPORT.md](SUPPORT.md) for troubleshooting guidance

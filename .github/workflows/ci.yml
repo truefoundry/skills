@@ -4,9 +4,17 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,8 +24,30 @@ jobs:
 
       - name: Shellcheck scripts
         run: |
-          shellcheck scripts/*.sh hooks/auto-approve-tfy-api.sh skills/_shared/scripts/tfy-api.sh
+          shellcheck scripts/*.sh hooks/auto-approve-tfy-api.sh skills/_shared/scripts/*.sh plugin-scripts/*.sh
           find skills -mindepth 2 -name '*.sh' -print0 | xargs -0 -r shellcheck
+
+      - name: Repository hygiene
+        run: |
+          forbidden_paths=(
+            AGENTS.md
+            CLAUDE.md
+            claude.md
+            .agent
+            .agents
+            .claude/skills
+            .roo
+            .windsurf
+          )
+
+          for path in "${forbidden_paths[@]}"; do
+            tracked="$(git ls-files -- "$path")"
+            if [ -n "$tracked" ]; then
+              echo "Forbidden generated or local instruction path is tracked: $path" >&2
+              printf '%s\n' "$tracked" >&2
+              exit 1
+            fi
+          done
 
       - name: Validate skills
         run: ./scripts/validate-skills.sh
@@ -35,7 +65,9 @@ jobs:
 
   install-e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         include:
           - agent: claude
