@@ -1,12 +1,12 @@
 # TrueFoundry Agents
 
-A collection of 16 AI coding-agent skill definitions (markdown + shell scripts) following the [Agent Skills](https://agentskills.io) open format. Skills let AI assistants configure and manage TrueFoundry AI Gateway.
+A collection of 5 AI coding-agent skill definitions (markdown + shell scripts) following the [Agent Skills](https://agentskills.io) open format. Skills let AI assistants configure and manage TrueFoundry AI Gateway.
 
 ## Repository Overview
 
 This is a **content/tooling repository** -- there are no application servers, databases, or Docker containers. The codebase consists of:
 
-- **skills/** -- 16 skill directories (e.g. `ai-gateway`, `guardrails`, `mcp-servers`, `prompts`, `status`, etc.) each containing a `SKILL.md` frontmatter file, plus `_shared/` with canonical scripts and references synced to all skills.
+- **skills/** -- 5 skill directories (`gateway`, `platform`, `observability`, `tools`, `agents`) each containing a `SKILL.md` frontmatter file, plus `_shared/` with canonical scripts and references synced to all skills.
 - **scripts/** -- development and CI tooling (validation, sync, install, tests).
 - **hooks/** -- git pre-push hook and Claude Code auto-approve hook.
 
@@ -38,12 +38,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full development workflow.
 
 Orchestrates TrueFoundry AI Gateway configuration with enforced workflow steps. Use when setting up model routing, guardrails, rate limits, MCP servers, or prompts. Ensures workspace confirmation, secret creation, and configuration verification.
 
-Skills: truefoundry-ai-gateway, truefoundry-guardrails, truefoundry-mcp-servers, truefoundry-workspaces, truefoundry-secrets, truefoundry-prompts
+Skills: truefoundry-gateway, truefoundry-tools, truefoundry-platform, truefoundry-agents
 
 ### HARD RULES (NEVER VIOLATE)
 
 1. **NEVER auto-pick a workspace.** Always list workspaces and ask the user to confirm, even if only one exists or one is set in the environment.
-2. **NEVER inline credentials** in configurations. All sensitive values must use `tfy-secret://` references. Create secrets first using the secrets skill.
+2. **NEVER inline credentials** in configurations. All sensitive values must use `tfy-secret://` references. Create secrets first using the tools skill.
 3. **Always set `TFY_HOST`** before any tfy CLI command: `export TFY_HOST="${TFY_HOST:-${TFY_BASE_URL%/}}"`
 4. **NEVER delete any resource.** If the user asks to delete a gateway config, model route, guardrail, MCP server, or any other resource, do NOT call any DELETE API. Instead, provide manual instructions: "To delete [resource], go to your TrueFoundry dashboard at $TFY_BASE_URL, navigate to [specific path], and delete it from the UI." This is a safety measure to prevent accidental deletions.
 
@@ -66,17 +66,15 @@ Present the list. Wait for the user to confirm. Set `TFY_WORKSPACE_FQN`.
 
 #### Step 3: Analyze User Intent
 Determine configuration type from user request:
-- Model routing / virtual models -> ai-gateway skill
-- Guardrails (PII, moderation, injection detection) -> guardrails skill
-- MCP server registration -> mcp-servers skill
-- Prompt management -> prompts skill
-- Rate limiting / budget controls -> ai-gateway skill
-- AI agents configuration -> agents skill
+- Model routing / virtual models / rate limiting / budget / guardrails / monitoring → gateway skill
+- MCP server registration / secrets management → tools skill
+- Prompt management / AI agents configuration → agents skill
+- Workspace setup / access control → platform skill
 
 #### Step 4: Create Secrets (if needed)
 If the configuration requires sensitive values (provider API keys, tokens):
 1. Identify all sensitive values
-2. Create a TrueFoundry secret group
+2. Create a TrueFoundry secret group (tools skill)
 3. Add each secret
 4. Use `tfy-secret://tenant:group:key` references in the configuration
 
@@ -109,7 +107,7 @@ Present the diagnosis and suggested fix. Let the user decide how to proceed.
 
 Diagnoses TrueFoundry AI Gateway issues. Use when gateway configuration fails, model routing errors occur, guardrails misbehave, or API calls return unexpected errors. Fetches logs, identifies root causes, and suggests fixes.
 
-Skills: truefoundry-logs, truefoundry-ai-gateway, truefoundry-status, truefoundry-ai-monitoring
+Skills: truefoundry-observability, truefoundry-gateway, truefoundry-platform
 
 ### HARD RULES (NEVER VIOLATE)
 
@@ -124,7 +122,6 @@ Determine what's failing:
 - When it started happening
 
 ```bash
-# Use repo-relative path (works in Codex context)
 bash skills/_shared/scripts/tfy-api.sh GET /api/svc/v1/workspaces
 ```
 
@@ -147,7 +144,7 @@ Match error patterns to known issues:
 | `403 Forbidden` | Token lacks required access | Check token scope and workspace access |
 | `404 Not Found` | Wrong TFY_BASE_URL or resource missing | Verify URL and resource name |
 | `429 Too Many Requests` | Rate limit exceeded | Increase VAT rate limits or add request backoff |
-| `Model not found` | Model not configured in gateway routes | Add model route via ai-gateway skill |
+| `Model not found` | Model not configured in gateway routes | Add model route via gateway skill |
 | `Provider API error` | Upstream LLM provider issue | Check provider status, verify provider API key in secrets |
 | `Guardrail blocked request` | Content failed guardrail check | Review guardrail conditions, check enforcing strategy |
 | `MCP server timeout` | MCP endpoint unresponsive | Verify server URL, check if server is running |
@@ -161,7 +158,7 @@ Diagnosis: [COMPONENT] issue in [WORKSPACE]
 Error: [error message or behavior]
 Root Cause: [e.g., Model "gpt-4" not configured in gateway routes]
 Evidence: [relevant API response or log lines]
-Suggested Fix: [specific action, e.g., "Add gpt-4 route via ai-gateway skill"]
+Suggested Fix: [specific action, e.g., "Add gpt-4 route via gateway skill"]
 ```
 
 Do NOT auto-fix. Present the diagnosis and let the user decide next steps.

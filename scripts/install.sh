@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # TrueFoundry Agent Skills installer
 #
-# Install:  curl -fsSL https://raw.githubusercontent.com/truefoundry/tfy-gateway-skills/main/scripts/install.sh | bash
+# Install:  curl -fsSL https://raw.githubusercontent.com/truefoundry/skills/main/scripts/install.sh | bash
 # Options:  ... | bash -s -- [--global] [--local] [--agents claude,cursor,codex]
 #
 # Or run from inside the repo:  ./scripts/install.sh
 set -euo pipefail
 
-REPO="truefoundry/tfy-gateway-skills"
+REPO="truefoundry/skills"
 BRANCH="main"
 DEFAULT_REF="$BRANCH"
 SOURCE_REF="${TFY_SKILLS_REF:-$DEFAULT_REF}"
@@ -49,12 +49,12 @@ AGENTS_GLOBAL=(
 
 # All skill source directories in this repo.
 SKILL_NAMES=(
-  access-control access-tokens agents ai-gateway ai-monitoring docs guardrails integrations logs mcp-servers onboarding prompts secrets status tracing workspaces
+  agents codebase-scanner gateway observability onboard platform tools
 )
 
 # Shared files (relative to _shared/ in source)
 SHARED_SCRIPTS=( "scripts/tfy-api.sh" "scripts/tfy-version.sh" )
-SHARED_REFS=( "references/api-endpoints.md" "references/container-versions.md" "references/prerequisites.md" "references/tfy-api-setup.md" "references/gpu-reference.md" "references/cluster-discovery.md" "references/health-probes.md" "references/intent-clarification.md" "references/resource-estimation.md" "references/rest-api-manifest.md" "references/manifest-schema.md" "references/manifest-defaults.md" "references/cli-fallback.md" )
+SHARED_REFS=( "references/api-endpoints.md" "references/prerequisites.md" "references/tfy-api-setup.md" "references/intent-clarification.md" "references/cli-fallback.md" )
 
 # ── Parse args ───────────────────────────────────────────────────────────────
 MODE=""            # "" = auto (global + local if applicable), "global", "local"

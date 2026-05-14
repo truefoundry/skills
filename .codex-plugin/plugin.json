@@ -1,10 +1,22 @@
 {
-  "name": "truefoundry-gateway",
+  "name": "truefoundry",
   "version": "1.0.0",
-  "description": "Configure and manage TrueFoundry AI Gateway — model routing, guardrails, rate limiting, MCP servers, and monitoring.",
-  "author": { "name": "TrueFoundry" },
-  "homepage": "https://github.com/truefoundry/tfy-gateway-skills",
-  "repository": "https://github.com/truefoundry/tfy-gateway-skills",
+  "description": "TrueFoundry AI Gateway plugin — model routing, observability, cost tracking, guardrails, codebase migration, and agent onboarding.",
+  "author": {
+    "name": "TrueFoundry",
+    "url": "https://truefoundry.com"
+  },
+  "homepage": "https://github.com/truefoundry/skills",
+  "repository": "https://github.com/truefoundry/skills",
   "license": "MIT",
-  "skills": "./skills/"
+  "keywords": [
+    "truefoundry",
+    "ai-gateway",
+    "llm",
+    "observability",
+    "cost-tracking",
+    "model-routing"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
 }

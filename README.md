@@ -1,178 +1,218 @@
-# TrueFoundry Gateway Skills
+# TrueFoundry Skills
 
-[![CI](https://github.com/truefoundry/tfy-gateway-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/truefoundry/tfy-gateway-skills/actions/workflows/ci.yml)
+[![CI](https://github.com/truefoundry/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/truefoundry/skills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Configure and manage TrueFoundry AI Gateway using AI coding assistants.
-
-Works as a **plugin** for Claude Code and Codex CLI (with enforced workflows, credential checks, and secret scanning), and as **rules + skills** for Cursor.
+Official TrueFoundry plugin for AI coding agents. Unified repo for **Claude Code**, **Codex**, and **Cursor** — one install gives you gateway configuration, codebase migration, observability, and onboarding skills.
 
 ## Quick Start
 
 ### Prerequisites
-
-Set your TrueFoundry credentials via environment variables or a `.env` file in your project root:
 
 ```bash
 export TFY_BASE_URL=https://your-org.truefoundry.cloud
 export TFY_API_KEY=tfy-...
 ```
 
-No account yet? Run `uv run tfy register` to sign up. The `tfy` CLI and workspace selection are handled automatically -- skills install the CLI if missing and list your available workspaces.
+### Install
 
-### Claude Code (Plugin -- Full Enforcement)
+<details>
+<summary><strong>Claude Code (Plugin)</strong></summary>
 
-Install from the Claude Code plugin marketplace:
+Install from the plugin marketplace:
 
 ```
-/install-plugin truefoundry/tfy-gateway-skills
+/plugin install truefoundry@truefoundry/skills
+```
+
+Or use the CLI:
+
+```bash
+claude plugin add truefoundry/skills
 ```
 
 What you get:
-- 16 skills loaded automatically
+- 7 skills (gateway, platform, observability, tools, agents, onboard, codebase-scanner)
 - 2 specialized agents (gateway configurator, troubleshoot)
-- 3 hooks enforcing safe gateway workflows
-- Automatic credential checks on session start
+- 3 hooks (credential bootstrap, delete blocking, secret scanning)
+- MCP server for gateway observability tools
+- Slash commands: `/truefoundry:setup`, `/truefoundry:status`
+- `userConfig` prompts for TFY_BASE_URL + TFY_API_KEY on install
 
-### Codex CLI (Plugin -- Full Enforcement)
+</details>
 
-Install from the Codex plugin marketplace:
+<details>
+<summary><strong>Codex (Plugin)</strong></summary>
 
-```
-codex install truefoundry/tfy-gateway-skills
-```
-
-Enable hooks in your `config.toml`:
-
-```toml
-codex_hooks = true
-```
-
-Same hooks and skills as Claude Code. Agents are not yet supported in Codex.
-
-### Cursor (Rules -- Advisory)
-
-Copy the skills into Cursor's config directory:
+Add the marketplace and install:
 
 ```bash
-npx skills add truefoundry/tfy-gateway-skills -g -a cursor -s '*' -y
+codex plugin marketplace add truefoundry/skills
+codex plugin install truefoundry
 ```
 
 What you get:
-- 16 skills as context rules
-- No hook enforcement (Cursor does not support hooks)
-- Skills provide guidance but cannot block unsafe operations
+- 7 skills loaded automatically
+- MCP server for gateway tools
+- Same hooks as Claude Code (credential bootstrap, delete blocking, secret scanning)
 
-### Standalone Skills (Any Agent)
+</details>
 
-For any agent that supports the [Agent Skills](https://agentskills.io) open format:
+<details>
+<summary><strong>Cursor (Plugin)</strong></summary>
 
-```bash
-npx skills add truefoundry/tfy-gateway-skills -g -a claude-code -a cursor -a codex -s '*' -y
+Install from the Cursor marketplace (once listed):
+
+```
+/add-plugin truefoundry/skills
 ```
 
-Or install for all detected agents:
+Or install locally for testing:
 
 ```bash
-npx skills add truefoundry/tfy-gateway-skills --all
+git clone https://github.com/truefoundry/skills.git ~/.cursor/plugins/local/truefoundry
 ```
+
+What you get:
+- 7 skills as agent context
+- MCP server for gateway tools
+- Cursor rules (`.mdc`) for LLM code generation best practices
+- No hook enforcement (Cursor limitation)
+
+</details>
+
+<details>
+<summary><strong>Any Agent (npx skills add)</strong></summary>
+
+Works with any agent that supports the [Agent Skills](https://agentskills.io) format:
+
+```bash
+# All skills, all detected agents
+npx skills add truefoundry/skills -s '*' -y
+
+# Specific agent
+npx skills add truefoundry/skills -a claude-code -s '*' -y
+npx skills add truefoundry/skills -a cursor -s '*' -y
+npx skills add truefoundry/skills -a codex -s '*' -y
+
+# Single skill
+npx skills add truefoundry/skills -s codebase-scanner -y
+npx skills add truefoundry/skills -s onboard -y
+npx skills add truefoundry/skills -s gateway -y
+```
+
+</details>
 
 ## What You Can Do
 
-Just ask your agent in plain English:
+Ask your agent in plain English:
 
+- *"set up TrueFoundry gateway for this project"*
+- *"scan this codebase and migrate all LLM calls to the gateway"*
+- *"onboard me — I just signed up"*
 - *"set up model routing for gpt-4 and claude-3"*
 - *"add a PII guardrail to the gateway"*
 - *"register an MCP server"*
 - *"configure rate limits for my API token"*
+- *"show my gateway usage and costs"*
 - *"show my gateway monitoring dashboard"*
 - *"what's my connection status?"*
 
-## What's Included
+## Skills
 
-### 16 Skills
+| Skill | Description |
+|-------|-------------|
+| **gateway** | AI Gateway configuration: models, providers, guardrails, rate limiting, budget controls, routing |
+| **observability** | Monitoring, logs, usage dashboards, OpenTelemetry tracing |
+| **platform** | Platform ops: workspaces, clusters, deployments, access control |
+| **tools** | MCP server registration, secrets management, documentation |
+| **agents** | Prompt registry and AI agent management |
+| **onboard** | Interactive setup wizard: auth (email+OTP or PAT), provider keys, coding agent config |
+| **codebase-scanner** | Audit codebase for LLM/MCP calls, generate migration report, apply changes to route through gateway |
 
-| Category | Skills |
-|----------|--------|
-| **Gateway** | [agents](skills/agents), [ai-gateway](skills/ai-gateway), [ai-monitoring](skills/ai-monitoring), [guardrails](skills/guardrails), [integrations](skills/integrations), [mcp-servers](skills/mcp-servers), [prompts](skills/prompts) |
-| **Platform** | [access-control](skills/access-control), [access-tokens](skills/access-tokens), [docs](skills/docs), [logs](skills/logs), [onboarding](skills/onboarding), [secrets](skills/secrets), [status](skills/status), [tracing](skills/tracing), [workspaces](skills/workspaces) |
+## Plugin Components
 
-Installed skill names are namespaced as `truefoundry-<skill>` (e.g., `truefoundry-ai-gateway`).
+### Hooks (Claude Code & Codex)
 
-### Plugin Hooks (Claude Code and Codex)
-
-| Hook | Type | What It Does |
-|------|------|-------------|
-| **Session Start** | SessionStart | Verifies credentials, auto-installs/upgrades the `tfy` CLI, tests API connectivity, lists accessible workspaces |
-| **Block Deletes** | PreToolUse | Blocks all DELETE API calls -- redirects users to the TrueFoundry dashboard for manual deletion |
-| **Auto-Approve API** | PreToolUse | Auto-approves `tfy-api.sh` and `tfy-version.sh` calls so the agent does not prompt for each API request |
-| **Secret Scan** | PreToolUse | Blocks commands containing hardcoded API keys, tokens, or credentials -- enforces `tfy-secret://` references |
+| Hook | What It Does |
+|------|-------------|
+| **Session Start** | Verifies credentials, auto-installs `tfy` CLI, tests API connectivity |
+| **Block Deletes** | Blocks DELETE API calls — redirects to TrueFoundry dashboard |
+| **Secret Scan** | Blocks commands with hardcoded API keys — enforces `tfy-secret://` |
 
 ### Agents (Claude Code)
 
 | Agent | Purpose |
 |-------|---------|
-| **gateway-configurator** | Orchestrates AI Gateway configuration: credential check, workspace selection, secret creation, model routing, guardrails, MCP servers, rate limits, and verification. |
-| **troubleshoot** | Diagnoses gateway issues by checking configuration, fetching logs, and matching error patterns (401, 403, 429, model not found, guardrail blocked, etc.) to root causes. |
+| **gateway-configurator** | Full gateway setup: credentials, workspace, secrets, routing, guardrails, verification |
+| **troubleshoot** | Diagnoses gateway issues: checks config, logs, error patterns (401, 429, etc.) |
 
-### Safety Guardrails
+### Commands
 
-- **No delete operations** -- all delete requests are blocked and redirected to the dashboard
-- **No hardcoded secrets** -- commands with inline credentials are blocked before execution
-- **Mandatory workspace confirmation** -- agents always list workspaces and ask you to choose
+| Command | Description |
+|---------|-------------|
+| `/truefoundry:setup` | Interactive gateway setup for current project |
+| `/truefoundry:status` | Check gateway connection and usage status |
+
+### Rules (Cursor)
+
+| Rule | Description |
+|------|-------------|
+| `use-tfy-gateway.mdc` | Ensures LLM code always uses gateway patterns (env vars, model format, no hardcoded keys) |
 
 ## Feature Comparison
 
-| Feature | Claude Code | Codex CLI | Cursor | Standalone Skills |
-|---------|:-----------:|:---------:|:------:|:-----------------:|
-| 16 skills | yes | yes | yes | yes |
+| Feature | Claude Code | Codex | Cursor | npx skills |
+|---------|:-----------:|:-----:|:------:|:----------:|
+| 7 skills | yes | yes | yes | yes |
 | Hook enforcement | yes | yes | no | no |
-| Auto credential check | yes | yes | no | no |
-| Delete blocking | yes | yes | no | no |
-| Secret scan | yes | yes | no | no |
+| MCP server | yes | yes | yes | no |
 | Specialized agents | yes | no | no | no |
-| CLI auto-install | yes | yes | no | no |
+| Slash commands | yes | no | no | no |
+| Cursor rules | no | no | yes | no |
+| `userConfig` (secure key storage) | yes | yes | no | no |
 
 ## Architecture
 
 ```
-tfy-gateway-skills/
-  .claude-plugin/
-    plugin.json            # Plugin manifest (name, version, userConfig)
-    marketplace.json       # Marketplace metadata
-  hooks/
-    hooks.json             # Hook definitions (SessionStart, PreToolUse)
-    auto-approve-tfy-api.sh
-  plugin-scripts/          # Hook implementations
-    session-start.sh       # Credential + CLI bootstrap
-    block-delete-operations.sh
-    pre-tool-secret-scan.sh
-  agents/
-    gateway-configurator.md
-    troubleshoot.md
-  skills/
-    _shared/               # Canonical copies of shared scripts and references
-      scripts/             # tfy-api.sh, tfy-version.sh
-      references/          # 13 shared reference docs
-    ai-gateway/SKILL.md    # One directory per skill
-    guardrails/SKILL.md
-    ...
-  scripts/                 # Dev tooling (lint, validate, sync, install)
+truefoundry/skills/
+├── .claude-plugin/          # Claude Code marketplace manifest
+├── .codex-plugin/           # Codex marketplace manifest
+├── .cursor-plugin/          # Cursor marketplace manifest
+├── .mcp.json                # Shared MCP server config
+├── skills/                  # Shared across all agents
+│   ├── gateway/
+│   ├── observability/
+│   ├── platform/
+│   ├── tools/
+│   ├── agents/
+│   ├── onboard/
+│   └── codebase-scanner/
+├── agents/                  # Subagent definitions
+├── commands/                # Slash commands
+├── hooks/                   # Event hooks + implementations
+├── rules/                   # Cursor .mdc rules
+├── plugin-scripts/          # Hook shell scripts
+└── scripts/                 # Dev tooling
 ```
-
-Shared scripts and references live in `skills/_shared/` and are synced to individual skill directories via `./scripts/sync-shared.sh`. Never edit files in `skills/*/scripts/` or `skills/*/references/` directly.
 
 ## Development
 
 ```bash
-./scripts/sync-shared.sh              # Sync shared files to all skills
 ./scripts/validate-skills.sh           # Validate skill structure
-./scripts/validate-skill-security.sh   # Offline security checks
-./scripts/test-tfy-api.sh             # Unit tests (needs python3 + curl)
-./scripts/install.sh                   # Install locally
+./scripts/validate-skill-security.sh   # Security checks
+./scripts/sync-shared.sh              # Sync shared files to all skills
+./scripts/test-tfy-api.sh             # Unit tests
+./scripts/install.sh                   # Install locally for all agents
 ```
 
-Shell scripts must pass `shellcheck`. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+## Marketplace Submission Status
+
+| Marketplace | Status | Install command |
+|-------------|--------|-----------------|
+| Claude Code | Pending | `/plugin install truefoundry@truefoundry/skills` |
+| Codex | Pending | `codex plugin marketplace add truefoundry/skills` |
+| Cursor | Pending | `cursor.com/marketplace` → TrueFoundry |
 
 ## License
 

@@ -1,6 +1,6 @@
 ---
 name: truefoundry-agents
-description: Manages TrueFoundry Agent Registry. List, create, update, and delete AI agents with prompt-backed sources, collaborator access, and sample inputs.
+description: Manages TrueFoundry prompt registry and agent registry. Handles listing, creating, updating, deleting, and tagging prompts and prompt versions, plus AI agent definitions with prompt-backed sources and collaborator access.
 license: MIT
 compatibility: Requires Bash, curl, and access to a TrueFoundry instance
 allowed-tools: Bash(*/tfy-api.sh *)
@@ -12,41 +12,183 @@ allowed-tools: Bash(*/tfy-api.sh *)
 
 # Agents
 
-List, create, update, and delete AI agents in the TrueFoundry Agent Registry.
+Manage prompts and AI agents on TrueFoundry.
 
-## When to Use
+## Scope
 
-Manage AI agents in the TrueFoundry Agent Registry — list agents, inspect agent details, create or update agent definitions, configure collaborator access, or delete agents.
+- **Prompt Management**: List, create, update, delete, and tag prompts and prompt versions in the TrueFoundry prompt registry.
+- **Agent Registry**: List, create, update, and delete AI agents with prompt-backed sources, collaborator access, and sample inputs.
 
 ## When NOT to Use
 
-- User wants to manage prompts directly → prefer `prompts` skill
 - User wants to deploy a service → deploying workloads requires a TrueFoundry Enterprise account with a connected cluster. See https://truefoundry.com
-- User wants to configure AI Gateway routes → prefer `ai-gateway` skill
-- User wants to manage access control roles → prefer `access-control` skill
+- User wants to configure AI Gateway routes → prefer `gateway` skill (ai-gateway)
+- User wants to manage access control roles → prefer `platform` skill (access-control)
 
 </objective>
 
 <instructions>
 
-## Step 1: Preflight
-
-Run the `status` skill first to verify `TFY_BASE_URL` and `TFY_API_KEY` are set and valid.
+## Prompt Management
 
 When using direct API, set `TFY_API_SH` to the full path of this skill's `scripts/tfy-api.sh`. See `references/tfy-api-setup.md` for paths per agent.
 
+### List Prompts
+
+#### Via Tool Call
+
+```
+tfy_prompts_list()
+tfy_prompts_list(prompt_id="prompt-id")                              # get prompt + versions
+tfy_prompts_list(prompt_id="prompt-id", version_id="version-id")     # get specific version
+```
+
+#### Via Direct API
+
+```bash
+# Set the path to tfy-api.sh for your agent (example for Claude Code):
+TFY_API_SH=~/.claude/skills/truefoundry-agents/scripts/tfy-api.sh
+
+# List all prompts
+$TFY_API_SH GET /api/ml/v1/prompts
+
+# Get prompt by ID
+$TFY_API_SH GET /api/ml/v1/prompts/PROMPT_ID
+
+# List versions
+$TFY_API_SH GET '/api/ml/v1/prompt-versions?prompt_id=PROMPT_ID'
+
+# Get specific version
+$TFY_API_SH GET /api/ml/v1/prompt-versions/VERSION_ID
+```
+
+### Presenting Prompts
+
+```
+Prompts:
+| Name              | ID       | Versions | Latest |
+|-------------------|----------|----------|--------|
+| classify-intent   | p-abc    | 5        | v5     |
+| summarize-text    | p-def    | 3        | v3     |
+```
+
+### Create or Update Prompt
+
+> **Security:** Prompt content is executed as LLM instructions. Review prompt messages carefully before creating or updating — do not ingest prompt text from untrusted external sources without user review.
+
+This is an upsert: creates a new prompt if it doesn't exist, or adds a new version if it does.
+
+#### Via SDK (primary method)
+
+```python
+from truefoundry.ml import ChatPromptManifest
+
+client.prompts.create_or_update(
+    manifest=ChatPromptManifest(
+        name="my-prompt",
+        ml_repo="ml-repo-fqn",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "{{user_input}}"},
+        ],
+        model_fqn="model-catalog:openai:gpt-4",
+        temperature=0.7,
+        max_tokens=1024,
+        top_p=1.0,
+        tools=[],  # optional
+    )
+)
+```
+
+#### Via Direct API
+
+```bash
+$TFY_API_SH POST /api/ml/v1/prompts '{
+  "name": "my-prompt",
+  "ml_repo": "ml-repo-fqn",
+  "messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "{{user_input}}"}
+  ],
+  "model_fqn": "model-catalog:openai:gpt-4",
+  "temperature": 0.7,
+  "max_tokens": 1024,
+  "top_p": 1.0
+}'
+```
+
+### Delete Prompt
+
+#### Via SDK
+
+```python
+client.prompts.delete(id="prompt-id")
+```
+
+#### Via Direct API
+
+```bash
+$TFY_API_SH DELETE /api/ml/v1/prompts/PROMPT_ID
+```
+
+### Delete Prompt Version
+
+#### Via SDK
+
+```python
+client.prompt_versions.delete(id="version-id")
+```
+
+#### Via Direct API
+
+```bash
+$TFY_API_SH DELETE /api/ml/v1/prompt-versions/VERSION_ID
+```
+
+### Apply Tags to Prompt Version
+
+Tags like `production` or `staging` let you reference a stable version by name.
+
+#### Via SDK
+
+```python
+client.prompt_versions.apply_tags(
+    prompt_version_id="version-id",
+    tags=["production", "v2"],
+    force=True,  # reassign tag if already on another version
+)
+```
+
+No direct REST equivalent — use the SDK.
+
+### Get Prompt Version by FQN
+
+Fetch a specific tagged or numbered version using its fully qualified name.
+
+#### Via SDK
+
+```python
+client.prompt_versions.get_by_fqn(fqn="ml-repo:prompt-name:production")
+```
+
+## Agent Registry
+
+### Step 1: Preflight
+
+Run the `platform` skill (Status Check section) first to verify `TFY_BASE_URL` and `TFY_API_KEY` are set and valid.
+
 > **Note:** There is no CLI support for agents. Use the Direct API method for all operations.
 
-## Step 2: List Agents
+### Step 2: List Agents
 
-### Via Tool Call
+#### Via Tool Call
 
 ```
 tfy_agents_list()
 tfy_agents_list(agent_id="AGENT_ID")   # get a single agent by ID
 ```
 
-### Via Direct API
+#### Via Direct API
 
 ```bash
 TFY_API_SH=~/.claude/skills/truefoundry-agents/scripts/tfy-api.sh
@@ -68,13 +210,13 @@ Agents:
 | classify-docs   | ag-def   | tenant:user:project:classify | 1              | user@example.com | 2026-03-20  |
 ```
 
-## Step 3: Create or Update Agent
+### Step 3: Create or Update Agent
 
 This is an upsert operation: creates a new agent if it doesn't exist, or updates it if it does.
 
-> **Prerequisite:** Agents require a `prompt_version_fqn` as their source. Use the `prompts` skill to list prompts and find the correct FQN before creating an agent.
+> **Prerequisite:** Agents require a `prompt_version_fqn` as their source. Use the Prompt Management section above to list prompts and find the correct FQN before creating an agent.
 
-### Via Tool Call
+#### Via Tool Call
 
 ```
 tfy_agents_create(payload={"manifest": {"name": "my-agent", "type": "agent", "description": "What this agent does", "source": {"type": "prompt", "prompt_version_fqn": "chat_prompt:tenant/user/project/name:version"}}})
@@ -82,7 +224,7 @@ tfy_agents_create(payload={"manifest": {"name": "my-agent", "type": "agent", "de
 
 **Note:** Requires human approval (HITL) via tool call.
 
-### Via Direct API
+#### Via Direct API
 
 ```bash
 $TFY_API_SH PUT /api/svc/v1/agents '{
@@ -126,11 +268,11 @@ $TFY_API_SH PUT /api/svc/v1/agents '{
 
 Subject format: `user:email@example.com` or `team:team-name`.
 
-## Step 4: Delete Agent
+### Step 4: Delete Agent
 
 Ask for confirmation before deleting — this is irreversible.
 
-### Via Tool Call
+#### Via Tool Call
 
 ```
 tfy_agents_delete(id="AGENT_ID")
@@ -138,7 +280,7 @@ tfy_agents_delete(id="AGENT_ID")
 
 **Note:** Requires human approval (HITL) via tool call.
 
-### Via Direct API
+#### Via Direct API
 
 ```bash
 $TFY_API_SH DELETE /api/svc/v1/agents/AGENT_ID
@@ -150,6 +292,16 @@ $TFY_API_SH DELETE /api/svc/v1/agents/AGENT_ID
 
 ## Success Criteria
 
+### Prompts
+- The user can see a formatted table of all prompts in the registry
+- The user can retrieve a specific prompt by ID and view its versions
+- The user can inspect the content of a specific prompt version
+- The user can create a new prompt or update an existing one with a new version
+- The user can delete a prompt or a specific prompt version
+- The user can apply tags (e.g., production) to a prompt version
+- The agent has presented prompts in a clear, tabular format
+
+### Agents
 - The user can list all agents in a formatted table
 - The user can retrieve a specific agent by ID and inspect its details
 - The user can create a new agent with a valid prompt source
@@ -164,15 +316,24 @@ $TFY_API_SH DELETE /api/svc/v1/agents/AGENT_ID
 
 ## Composability
 
-- **Preflight**: Use `status` skill to verify credentials before managing agents
-- **Requires prompts**: Agents reference a `prompt_version_fqn` as their source — use `prompts` skill to list or create prompts first
-- **With access-control**: Use `access-control` skill to manage broader role assignments beyond per-agent collaborators
-- **With ai-gateway**: Agents may be exposed through AI Gateway routes
+- **Preflight**: Use `platform` skill (Status Check section) to verify credentials before managing prompts or agents
+- **Create/update prompt flow**: Use `platform` skill (workspaces) to find the ML repo FQN, then create or update the prompt
+- **Tagging flow**: After creating a new version, apply a `production` tag to promote it
+- **Agents require prompts**: Agents reference a `prompt_version_fqn` as their source — list or create prompts first in the Prompt Management section
+- **With access-control**: Use `platform` skill (access-control) to manage broader role assignments beyond per-agent collaborators
+- **With ai-gateway**: Agents may be exposed through AI Gateway routes (use `gateway` skill)
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| `GET` | `/api/ml/v1/prompts` | List all prompts |
+| `GET` | `/api/ml/v1/prompts/{id}` | Get a prompt |
+| `POST` | `/api/ml/v1/prompts` | Create or update a prompt |
+| `DELETE` | `/api/ml/v1/prompts/{id}` | Delete a prompt |
+| `GET` | `/api/ml/v1/prompt-versions` | List prompt versions |
+| `GET` | `/api/ml/v1/prompt-versions/{id}` | Get a prompt version |
+| `DELETE` | `/api/ml/v1/prompt-versions/{id}` | Delete a prompt version |
 | `GET` | `/api/svc/v1/agents` | List all agents |
 | `GET` | `/api/svc/v1/agents/{id}` | Get a single agent |
 | `PUT` | `/api/svc/v1/agents` | Create or update an agent |
@@ -184,34 +345,58 @@ $TFY_API_SH DELETE /api/svc/v1/agents/AGENT_ID
 
 ## Error Handling
 
-### Agent Not Found
+### Prompts
+
+#### Prompt Not Found
+```
+Prompt ID not found. List prompts first to find the correct ID.
+```
+
+#### ML Repo Not Found
+```
+Invalid ml_repo FQN. Use the platform skill (workspaces) to list available ML repos.
+```
+
+#### Tag Already Assigned
+```
+Tag already exists on another version. Use force=True to reassign it.
+```
+
+#### Delete Fails — Prompt Has Tagged Versions
+```
+Cannot delete prompt with tagged versions. Remove tags first, then delete.
+```
+
+### Agents
+
+#### Agent Not Found
 ```
 Agent ID not found. List agents first to find the correct ID.
 ```
 
-### Invalid Prompt Version FQN
+#### Invalid Prompt Version FQN
 ```
 The prompt_version_fqn is invalid or the prompt version does not exist.
-Use the prompts skill to list available prompts and their version FQNs.
+Use the Prompt Management section to list available prompts and their version FQNs.
 ```
 
-### Permission Denied
+#### Permission Denied
 ```
 Cannot manage agents. Check your API key permissions.
 ```
 
-### Collaborator Subject Invalid
+#### Collaborator Subject Invalid
 ```
 Invalid collaborator subject format. Use "user:email@example.com" or "team:team-name".
 ```
 
-### Duplicate Agent Name
+#### Duplicate Agent Name
 ```
 An agent with this name already exists. The PUT endpoint will update the existing agent.
 If you want a new agent, use a different name.
 ```
 
-### Missing Required Fields
+#### Missing Required Fields
 ```
 Agent manifest requires at minimum: name, type ("agent"), and source with prompt_version_fqn.
 ```

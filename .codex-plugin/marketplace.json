@@ -1,11 +1,11 @@
 {
-  "name": "truefoundry-gateway",
+  "name": "truefoundry",
   "interface": {
-    "displayName": "TrueFoundry Gateway"
+    "displayName": "TrueFoundry"
   },
   "plugins": [
     {
-      "name": "truefoundry-gateway",
+      "name": "truefoundry",
       "source": {
         "source": "local",
         "path": "./"
