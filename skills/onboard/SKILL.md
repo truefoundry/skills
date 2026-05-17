@@ -1,6 +1,6 @@
 ---
 name: truefoundry-onboard
-description: First-time TrueFoundry setup. Guides the user to register in the browser if needed, collect the tenant URL, install the TrueFoundry CLI, run tfy login, and verify CLI login before other skills run.
+description: First-time TrueFoundry setup. Handles tenant registration, CLI installation, tfy login, and login verification. Use when no TrueFoundry credentials exist or when other skills report missing login.
 license: MIT
 compatibility: Requires Bash, Python 3, and the tfy CLI
 allowed-tools: Bash(tfy*) Bash(pip*) Bash(uv*) Bash(python*) Bash(cat*) Bash(mkdir*)
