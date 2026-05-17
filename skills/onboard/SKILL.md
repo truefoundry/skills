@@ -1,6 +1,6 @@
 ---
 name: truefoundry-onboard
-description: First-time TrueFoundry setup. Guides the user to register in the browser if needed, collect the tenant URL, install the TrueFoundry CLI, run tfy login, and verify CLI login before other skills run.
+description: First-time TrueFoundry setup. Handles tenant registration, CLI installation, tfy login, and login verification. Use when no TrueFoundry credentials exist or when other skills report missing login.
 license: MIT
 compatibility: Requires Bash, Python 3, and the tfy CLI
 allowed-tools: Bash(tfy*) Bash(pip*) Bash(uv*) Bash(python*) Bash(cat*) Bash(mkdir*)
@@ -101,6 +101,14 @@ You can now use the other TrueFoundry skills.
 ```
 
 If it still prints missing, ask the user to rerun `tfy login --host <tenant-url>` and paste any error message.
+
+### After Onboarding — What NOT to Do
+
+Once `tfy login` succeeds:
+- Do NOT probe for verification commands (`tfy whoami`, `tfy config get`, `tfy get workspace`) — they don't exist.
+- Do NOT re-verify by fetching READMEs or documentation.
+- The single valid verification is the credentials.json check above. If that passes, login is done.
+- If the user immediately asks a follow-up like "what models are attached?", the answer is one API call: `$TFY_API_SH GET /api/svc/v1/provider-accounts`. Go straight there.
 
 </instructions>
 

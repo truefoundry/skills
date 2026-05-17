@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# TrueFoundry Codebase Scanner — finds all LLM call sites, MCP configs, and credentials
+# TrueFoundry Integrate Gateway — finds all LLM call sites, MCP configs, and credentials
 # Usage: ./scan.sh [target_dir] [--json] [--skip-tests]
 #
 # Outputs a structured report of all findings.
