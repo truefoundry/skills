@@ -52,7 +52,8 @@ Or for just an audit:
 
 ## Prerequisites
 
-- A TrueFoundry account with API key (PAT or VAT)
+- A completed TrueFoundry onboarding flow with `tfy login`
+- A TrueFoundry API key (PAT or VAT) for Gateway model calls
 - Gateway access (SaaS: `https://gateway.truefoundry.ai`)
 - `rg` (ripgrep) installed for fast scanning — falls back to `grep` if unavailable
 - At least one provider configured in the gateway

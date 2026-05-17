@@ -27,8 +27,8 @@ Configure and operate TrueFoundry's AI Gateway: unified OpenAI-compatible LLM ac
 - User wants to deploy a self-hosted model -> deploying self-hosted models requires a TrueFoundry Enterprise account with a connected cluster. See https://truefoundry.com
 - User wants to deploy tool servers -> deploying workloads requires a TrueFoundry Enterprise account with a connected cluster. See https://truefoundry.com
 - User wants to manage TrueFoundry platform credentials -> prefer `platform` skill (Status Check section); ask if the user wants another valid path
-- User wants to manage MCP servers (tool servers) -> prefer `tools` skill (MCP Servers section)
-- User wants to manage platform secrets directly -> prefer `tools` skill (Secrets section)
+- User wants to manage MCP servers (tool servers) -> prefer `mcp-servers` skill
+- User wants to manage platform secrets directly -> prefer `platform` skill (Secrets section)
 - User wants to instrument their own application with tracing -> prefer `observability` skill (Tracing section) (this skill is for querying existing gateway traces, not adding instrumentation)
 - User wants to view application container logs -> prefer `observability` skill (Application Logs section)
 
@@ -125,12 +125,14 @@ For any gateway entity or policy, follow this workflow:
 > **Security Policy: Credential Handling**
 > - All API keys and tokens in provider manifests MUST use `tfy-secret://` references, never raw values.
 > - The agent MUST NOT accept, store, log, echo, or display raw API keys or tokens in any context.
-> - Always instruct the user to store credentials in TrueFoundry secrets first (use `tools` skill (Secrets section)), then reference them via `tfy-secret://` URIs.
+> - Always instruct the user to store credentials in TrueFoundry secrets first (use `platform` skill (Secrets section)), then reference them via `tfy-secret://` URIs.
 > - If the user provides a raw API key directly in conversation, warn them and refuse to use it. Instruct them to store it as a secret first.
 
 ## Preflight
 
-Run the `platform` skill (Status Check section) first to verify `TFY_BASE_URL` and `TFY_API_KEY` are set and valid.
+Before changing gateway resources, verify `tfy login` is already complete. If CLI login is missing, stop and use `truefoundry-onboard`.
+
+Run the `platform` skill (Status Check section) to verify `TFY_BASE_URL`/`TFY_HOST`. `TFY_API_KEY` is only required for direct REST helper calls or Gateway model calls.
 
 When using direct API, set `TFY_API_SH` to the full path of this skill's `scripts/tfy-api.sh`. See `references/tfy-api-setup.md` for paths per agent.
 
@@ -610,7 +612,7 @@ Export traces to your observability stack:
 If a user has already deployed a tool server and wants to attach it to MCP gateway:
 
 1. Verify deployment status and endpoint URL via the TrueFoundry dashboard
-2. Register the endpoint as an MCP server (`tools` skill (MCP Servers section))
+2. Register the endpoint as an MCP server (`mcp-servers` skill)
 3. Confirm registration ID/name and share how to reference it in policies
 
 ### Framework Integration
@@ -699,7 +701,7 @@ The model count is derived from the `integrations` array length in each provider
 
 ### Create Provider Account
 
-Before creating, ensure the user has stored their provider credentials as TrueFoundry secrets (use `tools` skill (Secrets section)). All `bearer_token`, `api_key`, and credential fields MUST use `tfy-secret://` references.
+Before creating, ensure the user has stored their provider credentials as TrueFoundry secrets (use `platform` skill (Secrets section)). All `bearer_token`, `api_key`, and credential fields MUST use `tfy-secret://` references.
 
 #### Via Direct API
 
@@ -1636,12 +1638,12 @@ For SQL-based querying of gateway observability data, see these references:
 ## Composability
 
 - **Preflight**: Use `platform` skill (Status Check section) to verify platform connectivity before any operations
-- **Store credentials first**: Use `tools` skill (Secrets section) to create secret groups with API keys before adding providers
+- **Store credentials first**: Use `platform` skill (Secrets section) to create secret groups with API keys before adding providers
 - **Deploy model first**: Deploy a self-hosted model (requires TrueFoundry Enterprise), then add to gateway
 - **Need API key**: Create PAT/VAT in TrueFoundry dashboard -> Access
 - **Rate limiting**: Configure in dashboard -> AI Gateway -> Rate Limiting, or apply YAML with `tfy apply`
 - **Routing config**: Apply routing YAML directly with `tfy apply`; for CI/CD pipelines, integrate `tfy apply` into your automation
-- **Tool servers**: Deploy tool servers to your infrastructure, then register in gateway
+- **MCP servers**: Deploy MCP servers to your infrastructure, then register them with the `mcp-servers` skill
 - **Check deployed models**: Check the TrueFoundry dashboard to see running model services
 - **Benchmark through gateway**: Use your preferred load-testing tool against gateway endpoints
 - **Self-hosted models**: Deploy models to your infrastructure (requires TrueFoundry Enterprise), then register as self-hosted provider accounts
@@ -1729,7 +1731,7 @@ or update the existing account.
 The tfy-secret:// reference could not be resolved. Check:
 - Secret group exists and contains the referenced key
 - Format is tfy-secret://TENANT:SECRET_GROUP:SECRET_KEY
-- Use the secrets skill to verify the secret group and key exist
+- Use the platform skill (Secrets section) to verify the secret group and key exist
 ```
 
 #### Invalid Provider Type

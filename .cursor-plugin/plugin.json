@@ -1,7 +1,7 @@
 {
   "name": "truefoundry",
   "version": "1.0.0",
-  "description": "Route AI requests through TrueFoundry AI Gateway for observability, cost tracking, model switching, and safety guardrails. Includes skills for gateway setup, codebase migration, and platform management.",
+  "description": "Route AI requests through TrueFoundry AI Gateway for observability, cost tracking, model switching, safety guardrails, MCP servers, prompts, and Skills Registry workflows.",
   "author": {
     "name": "TrueFoundry",
     "url": "https://truefoundry.com"
@@ -17,6 +17,9 @@
     "cost-tracking",
     "model-routing",
     "guardrails",
-    "mcp"
+    "mcp",
+    "prompts",
+    "skills-registry",
+    "codebase-scanner"
   ]
 }

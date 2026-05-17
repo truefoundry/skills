@@ -49,7 +49,7 @@ AGENTS_GLOBAL=(
 
 # All skill source directories in this repo.
 SKILL_NAMES=(
-  agents codebase-scanner gateway observability onboard platform tools
+  agents codebase-scanner gateway mcp-servers observability onboard platform prompts skills-registry
 )
 
 # Shared files (relative to _shared/ in source)

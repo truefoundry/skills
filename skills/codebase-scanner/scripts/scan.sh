@@ -6,13 +6,12 @@
 set -euo pipefail
 
 TARGET_DIR="${1:-.}"
-OUTPUT_FORMAT="text"
 SKIP_TESTS=0
 
 # Parse args
 for arg in "$@"; do
   case "$arg" in
-    --json) OUTPUT_FORMAT="json" ;;
+    --json) ;; # reserved for future use
     --skip-tests) SKIP_TESTS=1 ;;
   esac
 done

@@ -1,7 +1,7 @@
 {
   "name": "truefoundry",
   "version": "1.0.0",
-  "description": "TrueFoundry AI Gateway plugin — model routing, observability, cost tracking, guardrails, codebase migration, and agent onboarding.",
+  "description": "TrueFoundry AI Gateway plugin — onboarding, model routing, MCP servers, prompts, Skills Registry workflows, observability, guardrails, and codebase migration.",
   "author": {
     "name": "TrueFoundry",
     "url": "https://truefoundry.com"
@@ -15,8 +15,12 @@
     "llm",
     "observability",
     "cost-tracking",
-    "model-routing"
+    "model-routing",
+    "guardrails",
+    "mcp",
+    "prompts",
+    "skills-registry",
+    "codebase-scanner"
   ],
-  "skills": "./skills/",
-  "mcpServers": "./.mcp.json"
+  "skills": "./skills/"
 }

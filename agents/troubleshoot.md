@@ -21,6 +21,19 @@ Determine what's failing:
 - When it started happening
 
 ```bash
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+path = Path.home() / ".truefoundry" / "credentials.json"
+try:
+    data = json.loads(path.read_text())
+except Exception:
+    data = {}
+
+if not ((data.get("host") or data.get("base_url")) and (data.get("access_token") or data.get("refresh_token"))):
+    raise SystemExit("tfy login is missing. Use truefoundry-onboard first.")
+PY
 TFY_API_SH="${CLAUDE_PLUGIN_ROOT:-~/.claude/skills/truefoundry-platform}/scripts/tfy-api.sh"
 # Check connectivity first
 bash $TFY_API_SH GET /api/svc/v1/workspaces

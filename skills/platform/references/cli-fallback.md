@@ -21,6 +21,21 @@ tfy --version 2>/dev/null
 # tfy CLI expects TFY_HOST when TFY_API_KEY is set
 export TFY_HOST="${TFY_HOST:-${TFY_BASE_URL%/}}"
 
+# Confirm tfy login exists before changing TrueFoundry resources
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+path = Path.home() / ".truefoundry" / "credentials.json"
+try:
+    data = json.loads(path.read_text())
+except Exception:
+    data = {}
+
+if not ((data.get("host") or data.get("base_url")) and (data.get("access_token") or data.get("refresh_token"))):
+    raise SystemExit("tfy login is missing. Use truefoundry-onboard first.")
+PY
+
 # Write manifest to file
 cat > tfy-manifest.yaml << 'EOF'
 name: my-mcp-server
@@ -80,9 +95,6 @@ $TFY_API_SH GET "/api/svc/v1/apps?workspaceFqn=${TFY_WORKSPACE_FQN}&applicationN
 ```bash
 pip install 'truefoundry==0.5.0'
 
-# New user signup
-uv run tfy register
-
 # Existing account: interactive login (recommended — avoids exposing credentials in shell history)
 tfy login --host "${TFY_HOST:-${TFY_BASE_URL%/}}"
 
@@ -91,7 +103,7 @@ tfy login --host "${TFY_HOST:-${TFY_BASE_URL%/}}"
 tfy login --host "${TFY_HOST:-${TFY_BASE_URL%/}}" --api-key "$TFY_API_KEY"
 ```
 
-For first-time setup, `tfy register` is interactive and may open a browser for CAPTCHA or other human verification. It then guides the user through email verification, returns the tenant URL, and points them to create a PAT. After that, export `TFY_API_KEY` and use the normal CLI or API flows.
+For first-time setup, stop and use the `truefoundry-onboard` skill. Do not duplicate signup or CLI-login onboarding steps in other skills. Direct REST fallback via `tfy-api.sh` still requires `TFY_API_KEY`.
 
 ## Decision Flowchart
 

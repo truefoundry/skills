@@ -72,7 +72,8 @@ Or with virtual models, the customer can keep their existing model names and the
 
 ## Prerequisites
 
-- Customer has TFY account with API key (`TFY_API_KEY`)
+- Customer has completed `tfy login`; if not, use `onboard` first
+- Customer has a TFY API key (`TFY_API_KEY`) for Gateway model calls
 - Customer has gateway access (`TFY_BASE_URL` or `https://gateway.truefoundry.ai`)
 - This skill operates on the codebase in the current working directory
 
@@ -596,11 +597,11 @@ Use `rg` with `--glob '!node_modules'` or equivalent exclusions.
 ## Composability
 
 - **Gateway config**: Use `gateway` skill after scan to configure routing, rate limits, guardrails
-- **Secrets**: Use `secrets` section of `tools` skill to manage TFY secret groups
+- **Secrets**: Use `platform` skill (Secrets section) to manage TFY secret groups
 - **Provider accounts**: Use `gateway` skill to manage provider accounts after initial setup
 - **Onboarding**: If customer has no TFY account yet, use `onboard` skill first
 - **Observability**: Use `observability` skill to verify traces are flowing after migration
-- **MCP servers**: Use `tools` skill (MCP Servers section) to register discovered MCP servers
+- **MCP servers**: Use `mcp-servers` skill to register discovered MCP servers
 
 ## Provider Account Reference
 

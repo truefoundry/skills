@@ -1,87 +1,27 @@
-# Install — TrueFoundry Gateway Onboarding Skill
+# Install — TrueFoundry Onboarding Skill
 
-One command. Works with Claude Code, Cursor, Codex, Windsurf, Cline, Roo Code, and OpenCode.
-
-## Quickest path
+Install just the onboarding skill:
 
 ```bash
 npx skills add truefoundry/skills -s onboard
 ```
 
-This installs only the onboarding skill. To install all TrueFoundry skills (gateway config, observability, platform admin, etc.):
+Or install all TrueFoundry skills:
 
 ```bash
 npx skills add truefoundry/skills --all
 ```
 
-## Claude Code (plugin install)
+After install, tell your agent:
 
-```bash
-/install-plugin truefoundry/skills
-```
+> Read https://www.github.com/truefoundry/skills/install.md and follow the instructions to register with TrueFoundry.
 
-This loads all skills + enforcement hooks (secret scanning, delete blocking, auto-approve for API calls).
+The onboarding flow is only:
 
-## Cursor
+1. Open https://www.truefoundry.com/register if you do not already have a tenant.
+2. Paste the tenant URL into the agent.
+3. Install or verify the `tfy` CLI.
+4. Run `tfy login --host <tenant-url>`.
+5. Verify CLI login is complete.
 
-```bash
-npx skills add truefoundry/skills -g -a cursor -s onboard -y
-```
-
-## Codex CLI
-
-```bash
-npx skills add truefoundry/skills -g -a codex -s onboard -y
-```
-
-## Manual (any agent)
-
-Copy `SKILL.md` into your agent's skills directory:
-
-| Agent | Path |
-|-------|------|
-| Claude Code | `~/.claude/skills/truefoundry-onboard/SKILL.md` |
-| Cursor | `~/.cursor/skills/truefoundry-onboard/SKILL.md` |
-| Codex | `~/.codex/skills/truefoundry-onboard/SKILL.md` |
-| Windsurf | `~/.windsurf/skills/truefoundry-onboard/SKILL.md` |
-| Cline | `~/.cline/skills/truefoundry-onboard/SKILL.md` |
-| Roo Code | `~/.roo-code/skills/truefoundry-onboard/SKILL.md` |
-| OpenCode | `~/.config/opencode/skill/truefoundry-onboard/SKILL.md` |
-
-## After install
-
-Just tell your agent:
-
-> "Set up TrueFoundry gateway for this project"
-
-Or more specifically:
-
-> "Onboard me to TrueFoundry — I have my email ready"
-
-The skill handles the rest — auth, provider linking, agent config, env setup, smoke test.
-
-## What you need
-
-- An email address (for new signups via OTP) or an existing TrueFoundry PAT
-- At least one LLM provider key (OpenAI, Anthropic, Google, etc.) to link
-
-## What you get
-
-- Every LLM request tracked (cost, tokens, latency)
-- Model switching without code changes
-- Budget controls and rate limits
-- Full request tracing and observability
-- One API key for all providers
-- Your coding agent (Claude Code, Codex, Cursor) pre-configured
-
-## Flow overview
-
-```
-1. Auth      -> email+OTP (no browser) or paste existing PAT
-2. Providers -> paste API keys, agent stores as secrets + creates accounts
-3. Env       -> .env written with gateway URL + key
-4. Agents    -> Claude Code / Codex / Cursor configured automatically
-5. Verify    -> live LLM call through the gateway confirms everything works
-```
-
-Total time: ~2 minutes for a new user, ~30 seconds if you already have a PAT.
+This skill stops after CLI login verification.

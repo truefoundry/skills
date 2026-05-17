@@ -38,4 +38,7 @@ __pycache__/
 .zencoder/
 /CLAUDE.md
 /claude.md
+/AGENTS.md
+/agents.md
+.mcp.json
 skills-lock.json
