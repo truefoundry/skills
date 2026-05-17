@@ -1,18 +1,8 @@
 # TrueFoundry Skills
 
-Route every LLM call through a managed gateway. One plugin gives your coding agent the ability to set up routing, guardrails, rate limits, observability, and codebase migration — all through plain English.
+[TrueFoundry AI Gateway](https://truefoundry.com) is the proxy layer that sits between your applications and LLM providers and MCP servers. It's an enterprise-grade platform that gives you access to 1000+ LLMs through a unified interface while handling observability and governance.
 
-```
-  "set up the gateway for this project"
-  │
-  ● agent reads your codebase
-  │
-  ● finds every LLM call (OpenAI, Anthropic, LangChain, …)
-  │
-  ● rewrites them to route through TrueFoundry Gateway
-  │
-  ✓ unified billing, guardrails, model routing — done
-```
+This is the official skills repo — it lets your coding agent set up and manage the gateway through plain English.
 
 ## Setup
 
