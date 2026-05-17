@@ -24,34 +24,20 @@ Read https://github.com/truefoundry/skills/install.md and follow the instruction
 
 The agent will walk you through registration, CLI install, and `tfy login`. Nothing else runs until login is verified.
 
-### Install the plugin
+### Install
 
-**Claude Code**
-```bash
-claude plugin add truefoundry/skills
-```
-
-**Codex**
-```bash
-codex plugin install truefoundry
-```
-
-**Cursor** — install from marketplace or clone locally:
-```bash
-git clone https://github.com/truefoundry/skills.git ~/.cursor/plugins/local/truefoundry
-```
-
-**Any agent** (via [Agent Skills](https://agentskills.io)):
 ```bash
 npx skills add truefoundry/skills -s '*' -y
 ```
+
+This works with any agent that supports [Agent Skills](https://agentskills.io) — Claude Code, Codex, Cursor, etc.
 
 ## What you can ask
 
 - *"scan this codebase and migrate all LLM calls to the gateway"*
 - *"add a PII guardrail to my gateway"*
 - *"set up model routing for gpt-4 and claude-3"*
-- *"configure rate limits for my API token"*
+- *"configure rate limits for my model"*
 - *"show my gateway usage and costs"*
 - *"register an MCP server"*
 - *"create a prompt in the prompt registry"*
