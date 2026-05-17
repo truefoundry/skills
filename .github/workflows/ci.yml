@@ -78,5 +78,5 @@ jobs:
           test "$skill_count" = "$expected_count"
 
           test -L "$target_dir/truefoundry-gateway/scripts"
-          test -L "$target_dir/truefoundry-gateway/references"
+          test -d "$target_dir/truefoundry-gateway/references"
           test -x "$target_dir/_shared/scripts/tfy-api.sh"
