@@ -17,6 +17,7 @@ jobs:
       - name: Shellcheck scripts
         run: |
           shellcheck scripts/*.sh hooks/auto-approve-tfy-api.sh skills/_shared/scripts/tfy-api.sh
+          shellcheck plugin-scripts/*.sh
           find skills -mindepth 2 -name '*.sh' -print0 | xargs -0 -r shellcheck
 
       - name: Validate skills
@@ -76,6 +77,6 @@ jobs:
           expected_count=$(find "$PWD/skills" -mindepth 1 -maxdepth 1 -type d -not -name '_*' | wc -l | tr -d ' ')
           test "$skill_count" = "$expected_count"
 
-          test -L "$target_dir/truefoundry-status/scripts"
-          test -L "$target_dir/truefoundry-status/references"
+          test -L "$target_dir/truefoundry-gateway/scripts"
+          test -L "$target_dir/truefoundry-gateway/references"
           test -x "$target_dir/_shared/scripts/tfy-api.sh"
