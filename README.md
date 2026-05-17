@@ -24,13 +24,32 @@ Read https://github.com/truefoundry/skills/install.md and follow the instruction
 
 The agent will walk you through registration, CLI install, and `tfy login`. Nothing else runs until login is verified.
 
-### Install
+### Install the plugin
 
-```bash
-npx skills add truefoundry/skills -s '*' -y
+**Claude Code**
+
+```shell
+/plugin marketplace add truefoundry/skills
+/plugin install truefoundry@truefoundry-skills
 ```
 
-This works with any agent that supports [Agent Skills](https://agentskills.io) — Claude Code, Codex, Cursor, etc.
+**Codex**
+
+```shell
+codex plugin marketplace add truefoundry/skills
+```
+
+Then open the plugin list with `/plugins` and install `truefoundry`.
+
+**Cursor**
+
+For local testing:
+
+```bash
+git clone https://github.com/truefoundry/skills.git ~/.cursor/plugins/local/truefoundry
+```
+
+For team-wide: import `https://github.com/truefoundry/skills` from Dashboard → Settings → Plugins → Import.
 
 ## What you can ask
 
