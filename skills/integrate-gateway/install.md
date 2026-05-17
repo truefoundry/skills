@@ -1,14 +1,14 @@
-# Install — TrueFoundry Codebase Scanner Skill
+# Install — TrueFoundry Integrate Gateway Skill
 
-Scan your codebase for all LLM calls and migrate them to route through TrueFoundry AI Gateway.
+Integrate your codebase with TrueFoundry AI Gateway — scan, plan, migrate, and verify.
 
 ## Quickest path
 
 ```bash
-npx skills add truefoundry/skills -s codebase-scanner
+npx skills add truefoundry/skills -s integrate-gateway
 ```
 
-This installs only the codebase scanner skill. To install all TrueFoundry skills:
+This installs only the integrate-gateway skill. To install all TrueFoundry skills:
 
 ```bash
 npx skills add truefoundry/skills --all
@@ -20,12 +20,12 @@ npx skills add truefoundry/skills --all
 /install-plugin truefoundry/skills
 ```
 
-This loads all skills including the codebase scanner.
+This loads all skills including integrate-gateway.
 
 ## Cursor
 
 ```bash
-npx skills add truefoundry/skills -g -a cursor -s codebase-scanner -y
+npx skills add truefoundry/skills -g -a cursor -s integrate-gateway -y
 ```
 
 ## Manual (any agent)
@@ -34,17 +34,17 @@ Copy `SKILL.md` into your agent's skills directory:
 
 | Agent | Path |
 |-------|------|
-| Claude Code | `~/.claude/skills/truefoundry-codebase-scanner/SKILL.md` |
-| Cursor | `~/.cursor/skills/truefoundry-codebase-scanner/SKILL.md` |
-| Codex | `~/.codex/skills/truefoundry-codebase-scanner/SKILL.md` |
-| Windsurf | `~/.windsurf/skills/truefoundry-codebase-scanner/SKILL.md` |
-| Cline | `~/.cline/skills/truefoundry-codebase-scanner/SKILL.md` |
+| Claude Code | `~/.claude/skills/truefoundry-integrate-gateway/SKILL.md` |
+| Cursor | `~/.cursor/skills/truefoundry-integrate-gateway/SKILL.md` |
+| Codex | `~/.codex/skills/truefoundry-integrate-gateway/SKILL.md` |
+| Windsurf | `~/.windsurf/skills/truefoundry-integrate-gateway/SKILL.md` |
+| Cline | `~/.cline/skills/truefoundry-integrate-gateway/SKILL.md` |
 
 ## After install
 
 Tell your agent:
 
-> "Scan this codebase and migrate all LLM calls to TrueFoundry gateway"
+> "Integrate this codebase with TrueFoundry gateway"
 
 Or for just an audit:
 
@@ -54,21 +54,21 @@ Or for just an audit:
 
 - A completed TrueFoundry onboarding flow with `tfy login`
 - A TrueFoundry API key (PAT or VAT) for Gateway model calls
-- Gateway access (SaaS: `https://gateway.truefoundry.ai`)
+- `TFY_BASE_URL` set to your tenant URL
 - `rg` (ripgrep) installed for fast scanning — falls back to `grep` if unavailable
-- At least one provider configured in the gateway
 
 ## What you get
 
-- Complete inventory of all LLM call sites in your codebase
-- Migration report with per-file action items
-- Automatic provider account manifest generation
+- Deep analysis of all LLM call sites with effort classification
+- Gap analysis: what's in your code vs what's in the gateway
+- Migration plan with confirmation before any changes
+- Provider account creation and secret storage
 - Code changes to route through gateway (with confirmation)
-- Verification that requests flow through TFY with observability
+- End-to-end verification that requests flow through TFY
 - Hardcoded credential detection and secure migration to TFY Secrets
 
 ## Pairs well with
 
 - `onboard` — if you don't have a TFY account yet, start here
-- `gateway` — after scanning, use to configure routing, rate limits, guardrails
+- `gateway` — after integration, use to configure routing, rate limits, guardrails
 - `observability` — verify traces are flowing after migration

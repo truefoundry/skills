@@ -1,5 +1,5 @@
 ---
-name: integrate-gateway
+name: truefoundry-integrate-gateway
 description: Integrates a codebase with TrueFoundry AI Gateway. Scans for all LLM calls, MCP configs, and credentials, diffs against existing gateway config, generates a migration plan, applies code changes, and verifies routing end-to-end. Invoked from within the customer's codebase.
 license: MIT
 compatibility: Requires Bash, curl, rg (ripgrep), and access to a TrueFoundry instance
