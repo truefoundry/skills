@@ -24,7 +24,8 @@ Read https://github.com/truefoundry/skills/install.md and follow the instruction
 
 The agent will walk you through registration, CLI install, and `tfy login`. Nothing else runs until login is verified.
 
-### Install the plugin
+<details>
+<summary><strong>Install the plugin</strong></summary>
 
 **Claude Code**
 
@@ -50,6 +51,8 @@ git clone https://github.com/truefoundry/skills.git ~/.cursor/plugins/local/true
 ```
 
 For team-wide: import `https://github.com/truefoundry/skills` from Dashboard → Settings → Plugins → Import.
+
+</details>
 
 ## What you can ask
 
