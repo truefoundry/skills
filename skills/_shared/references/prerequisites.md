@@ -46,6 +46,16 @@ PY
 
 If the user does not have a TrueFoundry tenant or CLI login yet, stop and use the `truefoundry-onboard` skill. Do not duplicate onboarding steps in other skills.
 
+## CLI Command Boundaries
+
+The `tfy` CLI only supports these subcommands:
+
+- `tfy login` — authenticate
+- `tfy apply` — apply manifests
+- `tfy --version` — version check
+
+**These do NOT exist:** `tfy get`, `tfy config`, `tfy whoami`, `tfy list`, `tfy status`, `tfy download`, `tfy upload`. Do not probe for them. For any read operation, use the REST API via `tfy-api.sh`.
+
 ## Credential Check
 
 Run this to verify your environment:

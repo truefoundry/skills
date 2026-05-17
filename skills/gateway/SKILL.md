@@ -125,6 +125,7 @@ For any gateway entity or policy, follow this workflow:
 > **Security Policy: Credential Handling**
 > - All API keys and tokens in provider manifests MUST use `tfy-secret://` references, never raw values.
 > - The agent MUST NOT accept, store, log, echo, or display raw API keys or tokens in any context.
+> - **Never ask the user to paste an API key into chat.** Instead: (a) direct them to store it in TrueFoundry dashboard → Secrets, then give you only the `tfy-secret://` URI, or (b) have them set it via `! export TFY_API_KEY=...` so it stays in the shell environment and out of the conversation transcript.
 > - Always instruct the user to store credentials in TrueFoundry secrets first (use `platform` skill (Secrets section)), then reference them via `tfy-secret://` URIs.
 > - If the user provides a raw API key directly in conversation, warn them and refuse to use it. Instruct them to store it as a secret first.
 
@@ -139,6 +140,19 @@ When using direct API, set `TFY_API_SH` to the full path of this skill's `script
 ```bash
 TFY_API_SH=~/.claude/skills/truefoundry-gateway/scripts/tfy-api.sh
 ```
+
+## Quick Lookups — One Call, One Answer
+
+For read-only questions, go straight to the API call. Do not explore CLI subcommands, do not fetch READMEs, do not run `tfy get`, `tfy config`, or `tfy whoami` — they don't exist.
+
+| User asks | Single call |
+|-----------|------------|
+| What models/providers are attached? | `$TFY_API_SH GET /api/svc/v1/provider-accounts` |
+| What guardrails are configured? | `$TFY_API_SH GET /api/svc/v1/gateway-guardrails-configs` |
+| Show recent gateway requests | `$TFY_API_SH POST /api/svc/v1/spans/query '{"startTime":"...","dataRoutingDestination":"default","limit":20,"sortDirection":"desc"}'` |
+| Is the gateway reachable? | `curl -s "${TFY_BASE_URL}/api/llm/health"` or list provider accounts |
+
+**After login is confirmed, the next step for any read question is the API call above — nothing else.**
 
 ---
 
@@ -1618,6 +1632,8 @@ Convert `durationNs` (nanoseconds) to human-readable format: divide by 1,000,000
 
 ## Additional References
 
+- [cli-reference.md](references/cli-reference.md) -- Complete CLI reference: `tfy login`, `tfy apply`, `tfy delete`, flags, and what commands do NOT exist
+- [api-endpoints.md](references/api-endpoints.md) -- Full REST API reference with curl examples for every endpoint
 - [access-management.md](references/access-management.md) -- Identity types (Users, Teams, Virtual Accounts, External Identity), PAT/VAT auth, provider-account permissions, token auto-rotation, and secret store sync
 - [integrations.md](references/integrations.md) -- OpenAI-compatible integration, native SDK proxy support, and pre-built integration guides for IDEs, agent frameworks, and apps
 - [guardrail-providers.md](references/guardrail-providers.md) -- All 23 supported guardrail provider types and their configuration

@@ -102,6 +102,14 @@ You can now use the other TrueFoundry skills.
 
 If it still prints missing, ask the user to rerun `tfy login --host <tenant-url>` and paste any error message.
 
+### After Onboarding — What NOT to Do
+
+Once `tfy login` succeeds:
+- Do NOT probe for verification commands (`tfy whoami`, `tfy config get`, `tfy get workspace`) — they don't exist.
+- Do NOT re-verify by fetching READMEs or documentation.
+- The single valid verification is the credentials.json check above. If that passes, login is done.
+- If the user immediately asks a follow-up like "what models are attached?", the answer is one API call: `$TFY_API_SH GET /api/svc/v1/provider-accounts`. Go straight there.
+
 </instructions>
 
 <success_criteria>
