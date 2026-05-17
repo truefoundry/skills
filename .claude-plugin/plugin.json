@@ -20,7 +20,7 @@
     "mcp",
     "prompts",
     "skills-registry",
-    "codebase-scanner"
+    "integrate-gateway"
   ],
   "skills": "./skills/",
   "agents": "./agents/",

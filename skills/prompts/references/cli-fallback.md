@@ -82,7 +82,7 @@ $TFY_API_SH PUT /api/svc/v1/apps '{
 }'
 ```
 
-See `references/rest-api-manifest.md` for complete REST API examples.
+See `references/api-endpoints.md` for the full REST API reference.
 
 ### Poll Status After Apply
 

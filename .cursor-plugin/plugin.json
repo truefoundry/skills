@@ -20,6 +20,6 @@
     "mcp",
     "prompts",
     "skills-registry",
-    "codebase-scanner"
+    "integrate-gateway"
   ]
 }

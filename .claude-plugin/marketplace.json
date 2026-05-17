@@ -17,7 +17,7 @@
       "homepage": "https://github.com/truefoundry/skills",
       "repository": "https://github.com/truefoundry/skills",
       "license": "MIT",
-      "keywords": ["truefoundry", "ai-gateway", "llm", "observability", "mcp", "codebase-scanner"]
+      "keywords": ["truefoundry", "ai-gateway", "llm", "observability", "mcp", "integrate-gateway"]
     }
   ]
 }

@@ -61,7 +61,7 @@ For team-wide: import `https://github.com/truefoundry/skills` from Dashboard →
 | Skill | What it does |
 |-------|-------------|
 | `gateway` | Model routing, providers, guardrails, rate limits, budget controls |
-| `codebase-scanner` | Finds every LLM call in your code, generates migration plan, rewrites to gateway |
+| `integrate-gateway` | Integrates a codebase with the AI Gateway — scans, plans, migrates, verifies |
 | `observability` | Usage dashboards, logs, OpenTelemetry tracing |
 | `platform` | CLI login, workspaces, clusters, secrets, access control |
 | `mcp-servers` | Create and manage remote, virtual, and hosted MCP servers |
@@ -76,7 +76,7 @@ For team-wide: import `https://github.com/truefoundry/skills` from Dashboard →
 truefoundry/skills/
 ├── skills/              ← shared skill definitions (all agents read these)
 │   ├── gateway/
-│   ├── codebase-scanner/
+│   ├── integrate-gateway/
 │   ├── observability/
 │   ├── platform/
 │   ├── mcp-servers/
