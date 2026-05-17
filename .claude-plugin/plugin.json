@@ -1,7 +1,7 @@
 {
   "name": "truefoundry",
   "version": "1.0.0",
-  "description": "TrueFoundry AI Gateway plugin — model routing, observability, cost tracking, guardrails, codebase migration, and agent onboarding. Works across Claude Code, Codex, and Cursor.",
+  "description": "TrueFoundry AI Gateway plugin — onboarding, model routing, MCP servers, prompts, Skills Registry workflows, observability, guardrails, and codebase migration. Works across Claude Code, Codex, and Cursor.",
   "author": {
     "name": "TrueFoundry",
     "url": "https://truefoundry.com"
@@ -18,20 +18,17 @@
     "model-routing",
     "guardrails",
     "mcp",
+    "prompts",
+    "skills-registry",
     "codebase-scanner"
   ],
   "skills": "./skills/",
   "agents": "./agents/",
   "hooks": "./hooks/hooks.json",
-  "mcpServers": "./.mcp.json",
   "userConfig": {
     "TFY_BASE_URL": {
       "description": "TrueFoundry platform URL (e.g., https://your-org.truefoundry.cloud)",
       "sensitive": false
-    },
-    "TFY_API_KEY": {
-      "description": "TrueFoundry API key for authentication",
-      "sensitive": true
     }
   }
 }

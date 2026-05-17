@@ -83,6 +83,7 @@ while IFS= read -r shared_file; do
   while IFS= read -r skill_dir; do
     skill_name="$(basename "$skill_dir")"
     [[ "$skill_name" == _shared ]] && continue
+    [[ "$skill_name" == onboard ]] && continue
     target="$skill_dir/$rel_path"
     if [[ ! -f "$target" ]]; then
       fail "missing shared file copy: $target"

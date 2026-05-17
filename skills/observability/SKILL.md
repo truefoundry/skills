@@ -358,12 +358,12 @@ traceloop.initialize({
 
 ## Composability
 
-- **Preflight**: Use `platform` skill (Status Check section) to verify TFY_BASE_URL and TFY_API_KEY
+- **Preflight**: Use `platform` skill (Status Check section) to verify `tfy login` and TFY_BASE_URL/TFY_HOST. `TFY_API_KEY` is only needed for direct REST helper calls.
 - **Find workspace**: Use `platform` skill (workspaces) to get workspace ID for log downloads
 - **Find app first**: Get the app ID or FQN from the TrueFoundry dashboard
 - **After deploy**: Check logs to verify the app started correctly
 - **Debug failures**: Download logs with `searchString=error`
-- **Secrets**: Use `tools` skill (secrets) to store TFY_API_KEY as a secret instead of hardcoding
+- **Secrets**: Use `platform` skill (Secrets section) to store TFY_API_KEY as a secret instead of hardcoding
 - **Deploy**: After instrumenting, deploy your application to your infrastructure
 
 ## API Endpoints

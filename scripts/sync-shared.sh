@@ -18,6 +18,7 @@ count=0
 for skill_dir in "$SKILLS_DIR"/*/; do
   skill_name=$(basename "$skill_dir")
   [[ "$skill_name" == _* ]] && continue
+  [[ "$skill_name" == onboard ]] && continue
   [ -f "$skill_dir/SKILL.md" ] || continue
 
   # Sync scripts
@@ -43,6 +44,7 @@ errors=0
 for skill_dir in "$SKILLS_DIR"/*/; do
   skill_name=$(basename "$skill_dir")
   [[ "$skill_name" == _* ]] && continue
+  [[ "$skill_name" == onboard ]] && continue
   [ -f "$skill_dir/SKILL.md" ] || continue
 
   for shared_file in "$SHARED_DIR"/scripts/* "$SHARED_DIR"/references/*; do

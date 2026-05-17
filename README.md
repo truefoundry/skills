@@ -3,16 +3,19 @@
 [![CI](https://github.com/truefoundry/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/truefoundry/skills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Official TrueFoundry plugin for AI coding agents. Unified repo for **Claude Code**, **Codex**, and **Cursor** — one install gives you gateway configuration, codebase migration, observability, and onboarding skills.
+Official TrueFoundry plugin for AI coding agents. Unified repo for **Claude Code**, **Codex**, and **Cursor** — one install gives you onboarding, gateway configuration, MCP servers, prompts, agent guidance, skills registry workflows, codebase migration, and observability.
 
 ## Quick Start
 
-### Prerequisites
+Paste this into your coding agent:
 
-```bash
-export TFY_BASE_URL=https://your-org.truefoundry.cloud
-export TFY_API_KEY=tfy-...
-```
+> Read https://www.github.com/truefoundry/skills/install.md and follow the instructions to register with TrueFoundry.
+
+For first-time setup, the agent should use the `truefoundry-onboard` skill. It checks CLI login, sends new users to https://www.truefoundry.com/register, asks them to return with their tenant URL, installs the TrueFoundry CLI if needed, and runs `tfy login --host <tenant-url>`.
+
+Before any operational skill runs, the agent must verify that `tfy login` is already complete. If CLI login is missing, route the user back through `truefoundry-onboard`.
+
+Onboarding stops after CLI login verification. Operational setup belongs to the other TrueFoundry skills.
 
 ### Install
 
@@ -32,12 +35,11 @@ claude plugin add truefoundry/skills
 ```
 
 What you get:
-- 7 skills (gateway, platform, observability, tools, agents, onboard, codebase-scanner)
+- 9 skills (onboard, gateway, mcp-servers, platform, prompts, agents, skills-registry, observability, codebase-scanner)
 - 2 specialized agents (gateway configurator, troubleshoot)
 - 3 hooks (credential bootstrap, delete blocking, secret scanning)
-- MCP server for gateway observability tools
 - Slash commands: `/truefoundry:setup`, `/truefoundry:status`
-- `userConfig` prompts for TFY_BASE_URL + TFY_API_KEY on install
+- `userConfig` prompts for TFY_BASE_URL on install
 
 </details>
 
@@ -52,8 +54,7 @@ codex plugin install truefoundry
 ```
 
 What you get:
-- 7 skills loaded automatically
-- MCP server for gateway tools
+- 9 skills loaded automatically
 - Same hooks as Claude Code (credential bootstrap, delete blocking, secret scanning)
 
 </details>
@@ -74,8 +75,7 @@ git clone https://github.com/truefoundry/skills.git ~/.cursor/plugins/local/true
 ```
 
 What you get:
-- 7 skills as agent context
-- MCP server for gateway tools
+- 9 skills as agent context
 - Cursor rules (`.mdc`) for LLM code generation best practices
 - No hook enforcement (Cursor limitation)
 
@@ -113,6 +113,9 @@ Ask your agent in plain English:
 - *"set up model routing for gpt-4 and claude-3"*
 - *"add a PII guardrail to the gateway"*
 - *"register an MCP server"*
+- *"create a prompt in the prompt registry"*
+- *"show me how to publish a skill to the Skills Registry"*
+- *"show me how to create and publish an agent"*
 - *"configure rate limits for my API token"*
 - *"show my gateway usage and costs"*
 - *"show my gateway monitoring dashboard"*
@@ -124,10 +127,12 @@ Ask your agent in plain English:
 |-------|-------------|
 | **gateway** | AI Gateway configuration: models, providers, guardrails, rate limiting, budget controls, routing |
 | **observability** | Monitoring, logs, usage dashboards, OpenTelemetry tracing |
-| **platform** | Platform ops: workspaces, clusters, deployments, access control |
-| **tools** | MCP server registration, secrets management, documentation |
-| **agents** | Prompt registry and AI agent management |
-| **onboard** | Interactive setup wizard: auth (email+OTP or PAT), provider keys, coding agent config |
+| **platform** | Platform ops: CLI login checks, workspaces, clusters, access control, secrets, PATs |
+| **mcp-servers** | MCP server registry: list, create, update remote, virtual, OpenAPI, and hosted stdio-backed MCP servers |
+| **prompts** | Prompt Registry: list, create, update, version, tag, and reference prompts |
+| **agents** | UI-first Agent Registry workflows: create, test, publish, edit, and attach MCP servers or skills |
+| **skills-registry** | Skills Registry: publish, version, download, update, and attach reusable Agent Skills |
+| **onboard** | First-time setup: browser registration, tenant URL, CLI install, `tfy login`, login verification |
 | **codebase-scanner** | Audit codebase for LLM/MCP calls, generate migration report, apply changes to route through gateway |
 
 ## Plugin Components
@@ -136,7 +141,7 @@ Ask your agent in plain English:
 
 | Hook | What It Does |
 |------|-------------|
-| **Session Start** | Verifies credentials, auto-installs `tfy` CLI, tests API connectivity |
+| **Session Start** | Checks tenant config, auto-installs `tfy` CLI, and runs API checks when an API key is available |
 | **Block Deletes** | Blocks DELETE API calls — redirects to TrueFoundry dashboard |
 | **Secret Scan** | Blocks commands with hardcoded API keys — enforces `tfy-secret://` |
 
@@ -164,9 +169,8 @@ Ask your agent in plain English:
 
 | Feature | Claude Code | Codex | Cursor | npx skills |
 |---------|:-----------:|:-----:|:------:|:----------:|
-| 7 skills | yes | yes | yes | yes |
+| 9 skills | yes | yes | yes | yes |
 | Hook enforcement | yes | yes | no | no |
-| MCP server | yes | yes | yes | no |
 | Specialized agents | yes | no | no | no |
 | Slash commands | yes | no | no | no |
 | Cursor rules | no | no | yes | no |
@@ -179,13 +183,14 @@ truefoundry/skills/
 ├── .claude-plugin/          # Claude Code marketplace manifest
 ├── .codex-plugin/           # Codex marketplace manifest
 ├── .cursor-plugin/          # Cursor marketplace manifest
-├── .mcp.json                # Shared MCP server config
 ├── skills/                  # Shared across all agents
 │   ├── gateway/
+│   ├── mcp-servers/
 │   ├── observability/
 │   ├── platform/
-│   ├── tools/
+│   ├── prompts/
 │   ├── agents/
+│   ├── skills-registry/
 │   ├── onboard/
 │   └── codebase-scanner/
 ├── agents/                  # Subagent definitions

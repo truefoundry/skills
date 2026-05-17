@@ -32,18 +32,53 @@ TFY_API_KEY="${TFY_API_KEY:-${CLAUDE_PLUGIN_OPTION_TFY_API_KEY:-}}"
 # Resolve aliases
 TFY_BASE_URL="${TFY_BASE_URL:-${TFY_HOST:-${TFY_API_HOST:-}}}"
 
+# --- tfy login check ---
+tfy_login_status="missing"
+tfy_login_host=""
+tfy_login_messages=()
+
+if command -v python3 &>/dev/null; then
+  login_info=$(python3 - <<'PY' 2>/dev/null || true
+import json
+from pathlib import Path
+
+path = Path.home() / ".truefoundry" / "credentials.json"
+try:
+    data = json.loads(path.read_text())
+except Exception:
+    data = {}
+
+host = data.get("host") or data.get("base_url") or ""
+token = data.get("access_token") or data.get("refresh_token") or ""
+if host and token:
+    print(host)
+PY
+)
+  if [[ -n "${login_info:-}" ]]; then
+    tfy_login_status="ok"
+    tfy_login_host="$login_info"
+    TFY_BASE_URL="${TFY_BASE_URL:-$tfy_login_host}"
+  fi
+elif [[ -f "$HOME/.truefoundry/credentials.json" ]] && grep -q '"host"' "$HOME/.truefoundry/credentials.json"; then
+  tfy_login_status="unknown"
+  tfy_login_messages+=("Found TrueFoundry credentials file, but python3 is unavailable so login could not be parsed.")
+fi
+
+if [[ "$tfy_login_status" = "missing" ]]; then
+  tfy_login_messages+=("CLI login is missing. Use truefoundry-onboard, then run: tfy login --host <tenant-url>")
+fi
+
 # --- Credential check ---
 cred_status="ok"
 cred_messages=()
 
 if [[ -z "${TFY_BASE_URL:-}" ]]; then
   cred_status="missing"
-  cred_messages+=("TFY_BASE_URL is not set. Export it or add to .env")
+  cred_messages+=("TFY_BASE_URL is not set. Use the truefoundry-onboard skill for first-time setup.")
 fi
 
 if [[ -z "${TFY_API_KEY:-}" ]]; then
-  cred_status="missing"
-  cred_messages+=("TFY_API_KEY is not set. Export it or add to .env")
+  cred_messages+=("TFY_API_KEY is not set. This is fine for CLI flows; REST helper checks will be skipped.")
 fi
 
 # --- CLI check & auto-install ---
@@ -143,7 +178,7 @@ conn_messages=()
 workspace_count=0
 workspace_names=()
 
-if [[ "$cred_status" = "ok" ]]; then
+if [[ -n "${TFY_BASE_URL:-}" && -n "${TFY_API_KEY:-}" ]]; then
   BASE="${TFY_BASE_URL%/}"
   response_file=$(mktemp)
   http_code=$(curl -s -o "$response_file" -w '%{http_code}' \
@@ -197,6 +232,8 @@ except Exception:
   fi
 
   rm -f "$response_file"
+elif [[ -n "${TFY_BASE_URL:-}" && -z "${TFY_API_KEY:-}" ]]; then
+  conn_messages+=("Skipped REST API check because TFY_API_KEY is not set. Set it only for REST helper checks or Gateway model calls.")
 fi
 
 # --- Output summary ---
@@ -207,6 +244,10 @@ for msg in "${cred_messages[@]+"${cred_messages[@]}"}"; do
 done
 echo "  CLI: $cli_status${cli_version:+ ($cli_version)}"
 for msg in "${cli_messages[@]+"${cli_messages[@]}"}"; do
+  echo "    - $msg"
+done
+echo "  CLI login: $tfy_login_status${tfy_login_host:+ ($tfy_login_host)}"
+for msg in "${tfy_login_messages[@]+"${tfy_login_messages[@]}"}"; do
   echo "    - $msg"
 done
 echo "  Connection: $conn_status"
@@ -223,12 +264,9 @@ if [[ "$conn_status" = "connected" ]]; then
   fi
 fi
 
-if [[ "$cred_status" != "ok" ]]; then
+if [[ "$cred_status" != "ok" || "$tfy_login_status" = "missing" ]]; then
   echo ""
-  echo "Set credentials before configuring the gateway:"
-  echo "  export TFY_BASE_URL=https://your-org.truefoundry.cloud"
-  echo "  export TFY_API_KEY=your-api-key"
-  echo "Or add them to a .env file in your project directory."
+  echo "Run the truefoundry-onboard skill before configuring the gateway."
 fi
 
 if [[ "$conn_status" = "auth_failed" ]]; then
