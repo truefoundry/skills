@@ -9,7 +9,7 @@ This is the official skills repo — it lets your coding agent set up and manage
 Paste into Claude Code, Codex, or Cursor:
 
 ```text
-Read https://github.com/truefoundry/skills/install.md and follow the instructions to register with TrueFoundry.
+Read https://raw.githubusercontent.com/truefoundry/skills/main/install.md and follow the instructions to register with TrueFoundry.
 ```
 
 The agent will walk you through registration, CLI install, and `tfy login`. Nothing else runs until login is verified.
