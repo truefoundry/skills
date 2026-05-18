@@ -91,6 +91,7 @@ Before submitting a PR:
 2. Run validation and failure-mode tests:
    ```bash
    ./scripts/validate-skills.sh
+   ./scripts/check-tfy-cli-reference.sh
    ./scripts/validate-skill-security.sh
    ./scripts/test-tfy-api.sh
    ```

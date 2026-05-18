@@ -2,16 +2,10 @@
 
 ## Step 0: CLI and Login Check
 
-Check if the TrueFoundry CLI is available:
+First check if the TrueFoundry CLI is available. This tells you whether the TrueFoundry Python package and `tfy` entrypoint are installed:
 
 ```bash
 tfy --version 2>/dev/null
-```
-
-If `TFY_API_KEY` is set and you use `tfy` CLI commands (`tfy apply`), ensure `TFY_HOST` is set:
-
-```bash
-export TFY_HOST="${TFY_HOST:-${TFY_BASE_URL%/}}"
 ```
 
 If not found, install it:
@@ -20,9 +14,7 @@ If not found, install it:
 pip install 'truefoundry==0.5.0'
 ```
 
-> **Note:** The CLI (`tfy apply`) is the recommended deployment method, but it is not strictly required. All skills fall back to the REST API via `tfy-api.sh` when the CLI is unavailable.
-
-Before any non-onboarding skill changes TrueFoundry resources, check that CLI login already exists:
+After `tfy --version` works, check whether CLI login already exists:
 
 ```bash
 python3 - <<'PY'
@@ -44,17 +36,38 @@ else:
 PY
 ```
 
+If login is missing, say:
+
+```text
+Looks like the tenant is not set or CLI login is not done.
+If you have not already, create an account at https://www.truefoundry.com/register, complete the onboarding/signup flow, and paste your tenant URL here.
+```
+
+Then use the onboard skill to run:
+
+```bash
+tfy login --host "<tenant-url>"
+```
+
+If `TFY_API_KEY` is set and you use `tfy` CLI commands (`tfy apply`), ensure `TFY_HOST` is set:
+
+```bash
+export TFY_HOST="${TFY_HOST:-${TFY_BASE_URL%/}}"
+```
+
+> **Note:** The CLI (`tfy apply`) is the recommended deployment method, but it is not strictly required. All skills fall back to the REST API via `tfy-api.sh` when the CLI is unavailable.
+
 If the user does not have a TrueFoundry tenant or CLI login yet, stop and use the `truefoundry-onboard` skill. Do not duplicate onboarding steps in other skills.
 
 ## CLI Command Boundaries
 
-The `tfy` CLI only supports these subcommands:
+The current CLI surface is documented in `cli-reference.md`. Do not guess commands from common CLI patterns. If a command is not in `cli-reference.md`, run `tfy --help` or `tfy <subcommand> --help` before using it.
 
-- `tfy login` — authenticate
-- `tfy apply` — apply manifests
-- `tfy --version` — version check
+Common valid commands include `tfy login`, `tfy apply`, `tfy deploy`, `tfy get kubeconfig`, `tfy trigger job`, `tfy trigger workflow`, and `tfy ml download ...`.
 
-**These do NOT exist:** `tfy get`, `tfy config`, `tfy whoami`, `tfy list`, `tfy status`, `tfy download`, `tfy upload`. Do not probe for them. For any read operation, use the REST API via `tfy-api.sh`.
+Destructive commands such as `tfy delete` and `tfy terminate job` exist, but these skills must not execute them. Provide manual dashboard instructions instead.
+
+**These do NOT exist:** `tfy config`, `tfy show-config`, `tfy whoami`, `tfy list`, `tfy status`, top-level `tfy download`, and top-level `tfy upload`. Do not probe for them. For gateway/platform read operations, use the REST API via `tfy-api.sh`.
 
 ## Credential Check
 
