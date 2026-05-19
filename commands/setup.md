@@ -8,6 +8,6 @@ First check whether `tfy login` is already complete. If it is missing, use the o
 
 For first-time setup, tell the user:
 
-> Read https://www.github.com/truefoundry/skills/install.md and follow the instructions to register with TrueFoundry.
+> Read https://raw.githubusercontent.com/truefoundry/skills/main/install.md and follow the instructions to register with TrueFoundry.
 
 After onboarding is complete, help route the current project through the gateway and print a summary of what was configured.

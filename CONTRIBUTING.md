@@ -91,6 +91,7 @@ Before submitting a PR:
 2. Run validation and failure-mode tests:
    ```bash
    ./scripts/validate-skills.sh
+   ./scripts/check-tfy-cli-reference.sh
    ./scripts/validate-skill-security.sh
    ./scripts/test-tfy-api.sh
    ```
@@ -131,5 +132,4 @@ Before submitting a PR:
 ## Questions?
 
 - Open an issue at https://github.com/truefoundry/skills/issues
-- See [AGENTS.md](AGENTS.md) for agent-specific documentation
 - See [SUPPORT.md](SUPPORT.md) for troubleshooting guidance

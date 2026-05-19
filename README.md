@@ -6,13 +6,19 @@ This is the official skills repo — it lets your coding agent set up and manage
 
 ## Setup
 
-Paste into Claude Code, Codex, or Cursor:
+Install the skills:
 
-```text
-Read https://github.com/truefoundry/skills/install.md and follow the instructions to register with TrueFoundry.
+```bash
+npx skills add truefoundry/skills
 ```
 
-The agent will walk you through registration, CLI install, and `tfy login`. Nothing else runs until login is verified.
+Then open Claude Code, Codex, or Cursor and say:
+
+```text
+sign me up for truefoundry
+```
+
+The agent will check the CLI, walk you through account creation if needed, run `tfy login --host <tenant-url>`, and stop once login is verified.
 
 <details>
 <summary><strong>Install the plugin</strong></summary>

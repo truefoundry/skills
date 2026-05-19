@@ -113,6 +113,12 @@ if [[ "$installer_skills" != "$all_skill_dirs" ]]; then
   fail "install skill list mismatch. expected='$all_skill_dirs' actual='$installer_skills'"
 fi
 
+echo "Validating tfy CLI reference..."
+
+if ! "$REPO_ROOT/scripts/check-tfy-cli-reference.sh"; then
+  errors=$((errors + 1))
+fi
+
 if [[ "$errors" -gt 0 ]]; then
   echo "Validation failed with $errors error(s)." >&2
   exit 1

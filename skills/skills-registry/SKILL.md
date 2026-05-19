@@ -1,6 +1,6 @@
 ---
 name: truefoundry-skills-registry
-description: Manages TrueFoundry Skills Registry workflows. Covers creating, publishing, versioning, downloading, updating, and attaching reusable Agent Skills through UI, tfy upload skill, or tfy apply.
+description: Manages TrueFoundry Skills Registry workflows. Covers creating, publishing, versioning, downloading, updating, and attaching reusable Agent Skills through UI or tfy apply.
 license: MIT
 compatibility: Requires Bash, tfy CLI, and access to a TrueFoundry tenant
 allowed-tools: Bash(tfy*) Bash(python*) Bash(find*) Bash(rg*)
@@ -32,8 +32,8 @@ Use this skill when the user wants to:
 2. Confirm the target tenant and repository.
 3. Decide the publish path:
    - UI: single-file `SKILL.md`.
-   - `tfy upload skill`: multi-file skill bundles.
-   - `tfy apply`: declarative/GitOps flow.
+   - `tfy apply`: declarative/GitOps flow when an `agent-skill` manifest is available.
+   - Multi-file bundles: use the dashboard/registry workflow or exact product-provided command only after verifying it exists in `tfy --help`.
 
 ## UI Path
 
@@ -54,7 +54,7 @@ Required fields:
 
 To create a new version later, open the skill and click `New Version`.
 
-## CLI Upload
+## Multi-File Bundles
 
 Use this for multi-file skills with `references/`, `scripts/`, or `assets/`.
 
@@ -68,19 +68,15 @@ my-skill/
   assets/
 ```
 
-Publish:
-
-```bash
-tfy upload skill --dir ./my-skill
-```
-
 Before upload, inspect:
 
 ```bash
 find ./my-skill -maxdepth 3 -type f | sort
 ```
 
-Show the user the file list and ask for confirmation before upload.
+Show the user the file list and ask for confirmation before publishing.
+
+Do not run `tfy upload skill`; it is not present in `tfy 0.13.12`. If the product UI shows a generated command in the future, verify it with `tfy --help` before using it.
 
 ## Declarative Apply
 
@@ -95,11 +91,7 @@ Then ask for explicit confirmation.
 
 ## Download Existing Skill
 
-Use the Usage tab in the Skill Detail page to copy the exact command, or use:
-
-```bash
-tfy download skill --fqn <skill-fqn> --dir ./skills
-```
+Use the Usage tab in the Skill Detail page or the dashboard export/download flow.
 
 After download, inspect the files before editing.
 
@@ -118,7 +110,7 @@ Use `truefoundry-agents` for the agent-side flow.
 - Skills live inside a Repository.
 - Repository RBAC controls who can discover, use, and publish skill versions.
 - Skills can be pinned by version when attached to agents.
-- UI upload currently supports single-file `SKILL.md`; multi-file skills should use CLI upload or apply.
+- UI upload currently supports single-file `SKILL.md`; multi-file skills should use the dashboard/registry workflow or declarative apply when a manifest is available.
 
 ## Delete
 
@@ -128,10 +120,10 @@ Do not delete skills from the agent. If deletion is requested, direct the user t
 
 <success_criteria>
 
-- The user knows whether UI, upload, or apply is the right publish path.
+- The user knows whether UI, dashboard/registry workflow, or apply is the right publish path.
 - Single-file and multi-file skill flows are clearly separated.
 - New versions are created intentionally.
 - Skill attachment is routed through Agent Playground.
-- Final upload/apply is confirmed before execution.
+- Final publish/apply is confirmed before execution.
 
 </success_criteria>
