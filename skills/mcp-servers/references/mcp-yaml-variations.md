@@ -8,6 +8,19 @@ Use these examples when generating or reviewing MCP Gateway manifests. Treat the
 
 Security and trust policy: only use remote MCP URLs and OpenAPI spec URLs that the user explicitly confirms are trusted. Treat unknown remote URLs as untrusted, and do not run, import, or apply them without confirmation.
 
+## Contents
+
+- Remote MCP With No Auth
+- Remote MCP With Shared API Key
+- Remote MCP With Per-User API Key
+- Remote MCP With OAuth2 Authorization Code
+- Remote MCP With OAuth2 Client Credentials
+- Remote MCP With Token Passthrough
+- Virtual MCP With Selected Tools
+- Virtual MCP Exposing All Tools From A Source
+- OpenAPI MCP From Remote Spec
+- Hosted STDIO Input Shape
+
 ## Remote MCP With No Auth
 
 Auth disabled means omit `auth_data`.

@@ -6,6 +6,17 @@ description: UI navigation notes for TrueFoundry MCP Gateway server creation, ed
 
 Use this reference when operating or documenting the MCP Gateway dashboard. It captures observed UI paths from `AI Gateway -> MCP Gateway`.
 
+## Contents
+
+- Server List
+- Add Server Chooser
+- Connect Any Remote MCP Server
+- Remote MCP Auth Controls
+- Create Virtual MCP Server
+- Create Hosted STDIO MCP Server
+- Import From OpenAPI Spec
+- Add To Client
+
 ## Server List
 
 The MCP Gateway page shows server cards with:
@@ -187,4 +198,3 @@ The modal includes:
 - `Show API Key`
 
 Do not click, reveal, print, or paste API keys unless the user explicitly asks and accepts exposure.
-
