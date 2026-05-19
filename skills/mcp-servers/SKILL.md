@@ -49,6 +49,9 @@ Before every final `tfy apply`, always show:
 
 Then ask for explicit confirmation. Run only the dry-run before confirmation.
 
+For detailed dashboard click paths, use [references/mcp-gateway-ui-flows.md](references/mcp-gateway-ui-flows.md).
+For concrete manifest variants by server type and auth mode, use [references/mcp-yaml-variations.md](references/mcp-yaml-variations.md).
+
 ## List MCP Servers
 
 Use the platform UI when available. For API fallback:
