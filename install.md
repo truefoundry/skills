@@ -2,7 +2,7 @@
 
 Paste this into Claude Code, Codex, Cursor, or any coding agent that can read a URL:
 
-> Read https://www.github.com/truefoundry/skills/install.md and follow the instructions to register with TrueFoundry.
+> Read https://raw.githubusercontent.com/truefoundry/skills/main/install.md and follow the instructions to register with TrueFoundry.
 
 The agent should use the `truefoundry-onboard` skill and follow this exact flow:
 

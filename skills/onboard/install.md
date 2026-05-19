@@ -14,7 +14,7 @@ npx skills add truefoundry/skills --all
 
 After install, tell your agent:
 
-> Read https://www.github.com/truefoundry/skills/install.md and follow the instructions to register with TrueFoundry.
+> Read https://raw.githubusercontent.com/truefoundry/skills/main/install.md and follow the instructions to register with TrueFoundry.
 
 The onboarding flow is only:
 
