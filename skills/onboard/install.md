@@ -3,13 +3,13 @@
 Install just the onboarding skill:
 
 ```bash
-npx skills add truefoundry/skills -s onboard
+npx skills add truefoundry/skills --skill onboard --yes
 ```
 
 Or install all TrueFoundry skills:
 
 ```bash
-npx skills add truefoundry/skills --all
+npx skills add truefoundry/skills --skill '*' --yes
 ```
 
 After install, tell your agent:

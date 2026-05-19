@@ -4,12 +4,28 @@
 
 This is the official skills repo — it lets your coding agent set up and manage the gateway through plain English.
 
-## Setup
+## Installation
 
-Install the skills:
+### Quick Install
+
+Using `npx skills`:
+
+Local (current project):
 
 ```bash
-npx skills add truefoundry/skills
+npx skills add truefoundry/skills --skill '*' --yes
+```
+
+Global (all projects):
+
+```bash
+npx skills add truefoundry/skills --skill '*' --yes --global
+```
+
+To link skills to a specific agent, for example Claude Code:
+
+```bash
+npx skills add truefoundry/skills --agent claude-code --skill '*' --yes --global
 ```
 
 Then open Claude Code, Codex, or Cursor and say:
