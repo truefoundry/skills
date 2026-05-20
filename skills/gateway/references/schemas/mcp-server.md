@@ -1,11 +1,18 @@
 ---
 name: mcp-server-schema
-description: Complete schema reference for MCP server types -- remote, OpenAPI, and virtual -- including transport, auth, TLS, and tool filtering configurations.
+description: Compact schema reference for MCP Gateway manifests. For full YAML examples, use the MCP servers skill references.
 ---
 
 # MCP Server Schema Reference
 
-Three MCP server types can be registered with the gateway: remote endpoints, OpenAPI spec wrappers, and virtual (composite) servers.
+This file is a compact schema index for gateway-related work. The canonical MCP Gateway workflow lives in `skills/mcp-servers/SKILL.md`.
+
+For detailed examples, read:
+
+- `../../../mcp-servers/references/mcp-yaml-variations.md`
+- `../../../mcp-servers/references/mcp-gateway-ui-flows.md`
+
+Treat the live dashboard `Apply using YAML` preview as the source of truth when it differs from static examples.
 
 ## Fetch Existing Config
 
@@ -17,381 +24,124 @@ $TFY_API_SH GET /api/svc/v1/mcp-servers
 $TFY_API_SH GET /api/svc/v1/mcp-servers/SERVER_ID
 ```
 
-### Example Response
-
-```json
-{
-  "data": [
-    {
-      "id": "mcp-abc123",
-      "name": "my-remote-server",
-      "type": "mcp-server/remote",
-      "description": "Production analytics MCP server",
-      "url": "https://analytics.example.com/mcp",
-      "transport": "streamable-http",
-      "auth_data": {
-        "type": "header",
-        "headers": {
-          "Authorization": "Bearer tfy-secret://my-org:mcp-secrets:api-token"
-        }
-      },
-      "collaborators": [
-        { "subject": "user:jane@example.com", "role_id": "admin" }
-      ],
-      "tags": ["analytics", "production"]
-    },
-    {
-      "id": "mcp-def456",
-      "name": "dev-tools",
-      "type": "mcp-server/virtual",
-      "description": "Composite server",
-      "servers": [ ... ]
-    },
-    {
-      "id": "mcp-ghi789",
-      "name": "petstore-api",
-      "type": "mcp-server/openapi",
-      "description": "Petstore API exposed as MCP tools",
-      "spec": { "type": "remote", "url": "https://internal-api.example.com/openapi.json" }
-    }
-  ]
-}
-```
-
----
-
-## Schema Reference
-
-### Common Fields (All MCP Server Types)
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Unique server name |
-| `type` | string | Yes | `"mcp-server/remote"`, `"mcp-server/openapi"`, or `"mcp-server/virtual"` |
-| `description` | string | No | Human-readable description |
-| `collaborators` | array | No | Access control entries |
-| `tags` | string[] | No | Tags for organization and filtering |
-
-### Collaborator Entry
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `subject` | string | Yes | `user:<email>` or `team:<team-name>` |
-| `role_id` | string | Yes | `"admin"` or `"viewer"` |
-
----
-
-## Type 1: `mcp-server/remote`
-
-Connects to an existing MCP endpoint over HTTP.
-
-### Fields
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Unique server name |
-| `type` | string | Yes | `"mcp-server/remote"` |
-| `url` | string | Yes | MCP endpoint URL |
-| `transport` | string | Yes | `"streamable-http"` or `"sse"` |
-| `auth_data` | object | No | Authentication config (see Auth Options) |
-| `tls_settings` | object | No | TLS configuration (see TLS Settings) |
-| `description` | string | No | Human-readable description |
-| `collaborators` | array | No | Access control entries |
-| `tags` | string[] | No | Tags for organization |
-
-Internal URL pattern for cluster services: `http://{service-name}.{namespace}.svc.cluster.local:{port}/mcp`
-
-### Auth Options
-
-#### `header` -- Static Header Auth
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | string | Yes | `"header"` |
-| `headers` | object | Yes | Key-value pairs of headers to send |
-
-```yaml
-auth_data:
-  type: header
-  headers:
-    Authorization: "Bearer tfy-secret://my-org:mcp-secrets:api-token"
-```
-
-All header values containing credentials MUST use `tfy-secret://` references.
-
-#### `oauth2` -- OAuth2 Auth
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | string | Yes | `"oauth2"` |
-| `authorization_url` | string | Yes | OAuth2 authorization endpoint |
-| `token_url` | string | Yes | OAuth2 token endpoint |
-| `client_id` | string | Yes | OAuth2 client ID |
-| `client_secret` | string | Yes | `tfy-secret://` reference to client secret |
-| `jwt_source` | string | No | Token field to use (e.g., `"access_token"`) |
-| `scopes` | string[] | No | OAuth2 scopes to request |
-| `pkce` | boolean | No | Enable PKCE (`true`/`false`) |
-| `dynamic_client_registration` | object | No | Dynamic client registration config |
-
-```yaml
-auth_data:
-  type: oauth2
-  authorization_url: https://auth.example.com/authorize
-  token_url: https://auth.example.com/token
-  client_id: my-client-id
-  client_secret: tfy-secret://my-org:mcp-secrets:oauth-client-secret
-  jwt_source: access_token
-  scopes:
-    - read
-    - write
-  pkce: true
-```
-
-##### Dynamic Client Registration (Optional)
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `registration_endpoint` | string | Yes | Registration URL |
-| `initial_access_token` | string | No | `tfy-secret://` reference to registration token |
-
-```yaml
-dynamic_client_registration:
-  registration_endpoint: https://auth.example.com/register
-  initial_access_token: tfy-secret://my-org:mcp-secrets:registration-token
-```
-
-#### `passthrough` -- Forward TFY Credentials
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | string | Yes | `"passthrough"` |
-
-```yaml
-auth_data:
-  type: passthrough
-```
-
-Forwards TrueFoundry user credentials to the downstream MCP server.
-
-### TLS Settings (Optional)
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `ca_cert` | string | No | `tfy-secret://` reference to CA certificate PEM |
-| `insecure_skip_verify` | boolean | No | Skip TLS verification (`false` recommended) |
-
-```yaml
-tls_settings:
-  ca_cert: tfy-secret://my-org:mcp-secrets:ca-cert-pem
-  insecure_skip_verify: false
-```
-
-### Full Remote Server Example
-
-```yaml
-name: my-remote-server
-type: mcp-server/remote
-description: Production analytics MCP server
-url: https://analytics.example.com/mcp
-transport: streamable-http
-auth_data:
-  type: header
-  headers:
-    Authorization: "Bearer tfy-secret://my-org:mcp-secrets:api-token"
-tls_settings:
-  ca_cert: tfy-secret://my-org:mcp-secrets:ca-cert-pem
-  insecure_skip_verify: false
-collaborators:
-  - subject: user:jane@example.com
-    role_id: admin
-tags:
-  - analytics
-  - production
-```
-
----
-
-## Type 2: `mcp-server/openapi`
-
-Wraps an OpenAPI specification as an MCP server. Operations in the spec become MCP tools (max 30 tools).
-
-### Fields
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Unique server name |
-| `type` | string | Yes | `"mcp-server/openapi"` |
-| `spec` | object | Yes | OpenAPI spec source (see Spec Options) |
-| `auth_data` | object | No | Authentication config (same options as remote) |
-| `description` | string | No | Human-readable description |
-| `collaborators` | array | No | Access control entries |
-
-### Spec Options
-
-#### Remote Spec
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | string | Yes | `"remote"` |
-| `url` | string | Yes | URL to the OpenAPI JSON/YAML spec |
-
-```yaml
-spec:
-  type: remote
-  url: https://internal-api.example.com/openapi.json
-```
-
-> **Security:** Remote specs are fetched at runtime and auto-converted into MCP tools. Only use trusted, verified spec URLs.
-
-#### Inline Spec
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | string | Yes | `"inline"` |
-| `content` | string | Yes | Full OpenAPI spec as a YAML or JSON string |
-
-```yaml
-spec:
-  type: inline
-  content: |
-    openapi: "3.0.0"
-    info:
-      title: Internal API
-      version: "1.0"
-    paths:
-      /health:
-        get:
-          operationId: healthCheck
-          summary: Check service health
-          responses:
-            "200":
-              description: OK
-```
-
-Prefer `inline` for sensitive environments to eliminate runtime dependency on external endpoints.
-
-### Full OpenAPI Server Example (Remote Spec)
-
-```yaml
-name: petstore-api
-type: mcp-server/openapi
-description: Petstore API exposed as MCP tools
-spec:
-  type: remote
-  url: https://internal-api.example.com/openapi.json
-collaborators:
-  - subject: user:dev@example.com
-    role_id: viewer
-```
-
----
-
-## Type 3: `mcp-server/virtual`
-
-Composes multiple registered MCP servers into a single virtual server. Each sub-server can expose all or a filtered subset of its tools.
-
-### Fields
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Unique server name |
-| `type` | string | Yes | `"mcp-server/virtual"` |
-| `servers` | array | Yes | Array of sub-server references |
-| `description` | string | No | Human-readable description |
-| `collaborators` | array | No | Access control entries |
-
-### Sub-Server Entry
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Name of an already-registered MCP server |
-| `enabled_tools` | string[] | No | Subset of tools to expose. Omit to expose all tools. |
-
-```yaml
-servers:
-  - name: code-analysis-server
-    enabled_tools:
-      - lint
-      - format
-      - analyze
-  - name: deployment-server
-    enabled_tools:
-      - deploy
-      - rollback
-```
-
-### Full Virtual Server Example
-
-```yaml
-name: dev-tools
-type: mcp-server/virtual
-description: Composite server combining code analysis and deployment tools
-servers:
-  - name: code-analysis-server
-    enabled_tools:
-      - lint
-      - format
-      - analyze
-  - name: deployment-server
-    enabled_tools:
-      - deploy
-      - rollback
-collaborators:
-  - subject: team:platform-eng
-    role_id: viewer
-```
-
----
-
-## Generate and Validate Workflow
-
-### 1. Write YAML manifest
-
-Choose the appropriate type (`remote`, `openapi`, or `virtual`) and fill in all required fields per the schemas above.
-
-### 2. Validate (dry run)
+## Common Fields
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `name` | string | Yes | Unique MCP server name |
+| `type` | string | Yes | `mcp-server/remote`, `mcp-server/openapi`, or `mcp-server/virtual` |
+| `description` | string | Yes | Human-readable purpose |
+| `collaborators` | array | Yes | Access grants |
+| `tags` | string[] | No | Organization/filtering metadata |
+
+Collaborator subjects:
+
+- `user:<email>`
+- `team:<slug>`
+- `serviceaccount:<name>`
+- `virtualaccount:<name>`
+
+Use `role_id: mcp-server-manager` for management access unless the user requests another role.
+
+## Server Types
+
+### Remote
+
+Connects to an existing HTTP MCP endpoint.
+
+Required fields:
+
+- `name`
+- `description`
+- `type: mcp-server/remote`
+- `url`
+- `collaborators`
+
+Optional fields include `auth_data`, `tls_settings`, and `tags`.
+
+### OpenAPI
+
+Wraps OpenAPI operations as MCP tools.
+
+Required fields:
+
+- `name`
+- `description`
+- `type: mcp-server/openapi`
+- `spec`
+- `collaborators`
+
+Use only trusted remote spec URLs. Prefer inline specs for sensitive private APIs.
+
+### Virtual
+
+Composes existing MCP servers into one virtual server.
+
+Required fields:
+
+- `name`
+- `description`
+- `type: mcp-server/virtual`
+- `servers`
+- `collaborators`
+
+Each `servers[]` entry needs `name`. Add `enabled_tools` only when exposing a selected subset. Omit `enabled_tools` when exposing every tool from that source.
+
+### Hosted STDIO-Derived
+
+The UI starts from an `mcpServers` JSON object with `command`, `args`, and optional `env`, then generates the gateway manifest. Use the generated YAML preview as the manifest source of truth.
+
+## Auth Data
+
+No auth means omit `auth_data`.
+
+Supported auth modes:
+
+| UI mode | YAML shape |
+|---------|------------|
+| API Key / shared credentials | `auth_data.type: header`, `auth_level: global`, `headers` |
+| API Key / individual credentials | `auth_data.type: header`, `auth_level: per_user`, `headers` with placeholders |
+| OAuth2 authorization code | `auth_data.type: oauth2`, `grant_type: authorization_code` |
+| OAuth2 client credentials | `auth_data.type: oauth2`, `grant_type: client_credentials` |
+| Token passthrough | `auth_data.type: passthrough` |
+
+Use `tfy-secret://...` references for shared real credentials. Use placeholders such as `{{API_KEY}}` for per-user values.
+
+Read `../../../mcp-servers/references/mcp-yaml-variations.md` for concrete auth examples.
+
+## Tool Enablement
+
+For normal remote/OpenAPI servers:
+
+1. Fetch the current server config.
+2. Inspect the API response or UI YAML preview for the tool-selection shape.
+3. Modify only the requested tool-selection fields.
+4. Preserve URL/spec, auth, TLS, collaborators, tags, and unrelated fields.
+
+Do not guess field names for normal-server tool filtering.
+
+For virtual servers, use `servers[].enabled_tools`.
+
+## Generate And Validate
+
+Dry-run first:
 
 ```bash
 tfy apply -f mcp-server.yaml --dry-run --show-diff
 ```
 
-### 3. Fix any errors
-
-Common issues:
-- Invalid `transport` value (must be `"streamable-http"` or `"sse"`)
-- Missing `auth_data` fields for OAuth2 (requires `authorization_url`, `token_url`, `client_id`, `client_secret`)
-- Raw credentials in `headers` instead of `tfy-secret://` references
-- OpenAPI spec exceeds 30 tools limit
-- Virtual server references a `name` that does not match any registered MCP server
-- Inline spec has YAML syntax errors
-
-### 4. Apply
+Apply only after explicit confirmation:
 
 ```bash
 tfy apply -f mcp-server.yaml
 ```
 
-Or via direct API:
+Common checks:
 
-```bash
-$TFY_API_SH PUT /api/svc/v1/apps "$(cat mcp-server.yaml | yq -o json)"
-```
-
----
-
-## Checklist
-
-- [ ] Server `name` is unique
-- [ ] `type` is one of: `mcp-server/remote`, `mcp-server/openapi`, `mcp-server/virtual`
-- [ ] **Remote:** `url` is set and reachable from the cluster
-- [ ] **Remote:** `transport` is `"streamable-http"` or `"sse"`
-- [ ] **Remote:** All credential values in `auth_data.headers` use `tfy-secret://` references
-- [ ] **Remote:** OAuth2 includes all required fields (`authorization_url`, `token_url`, `client_id`, `client_secret`)
-- [ ] **Remote:** TLS `ca_cert` uses a `tfy-secret://` reference if specified
-- [ ] **OpenAPI:** `spec.type` is `"remote"` or `"inline"`
-- [ ] **OpenAPI:** Remote spec URL is trusted and verified by the user
-- [ ] **OpenAPI:** Spec produces at most 30 tools
-- [ ] **Virtual:** All servers listed in `servers[].name` are already registered
-- [ ] **Virtual:** `enabled_tools` lists only valid tool names from the referenced server
-- [ ] Collaborators are set appropriately for access control
-- [ ] Dry-run passes: `tfy apply -f manifest.yaml --dry-run --show-diff`
+- `name`, `description`, `type`, and collaborators are set.
+- Auth disabled omits `auth_data`.
+- API key auth includes `type: header`, `auth_level`, and headers.
+- OAuth2 auth includes the right `grant_type`, `token_url`, and `jwt_source`.
+- Shared secrets use `tfy-secret://...`.
+- Virtual source servers and `enabled_tools` are valid.
+- YAML preview and hand-written manifest agree; prefer the gateway preview.

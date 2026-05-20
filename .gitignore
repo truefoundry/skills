@@ -9,7 +9,6 @@ __pycache__/
 .augment/
 .claude/
 .codex/
-!/.codex/hooks.json
 .codebuddy/
 .commandcode/
 .continue/

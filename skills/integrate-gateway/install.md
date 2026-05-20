@@ -5,13 +5,13 @@ Integrate your codebase with TrueFoundry AI Gateway — scan, plan, migrate, and
 ## Quickest path
 
 ```bash
-npx skills add truefoundry/skills -s integrate-gateway
+npx skills add truefoundry/skills --skill integrate-gateway --yes
 ```
 
 This installs only the integrate-gateway skill. To install all TrueFoundry skills:
 
 ```bash
-npx skills add truefoundry/skills --all
+npx skills add truefoundry/skills --skill '*' --yes
 ```
 
 ## Claude Code (plugin install)
@@ -25,7 +25,7 @@ This loads all skills including integrate-gateway.
 ## Cursor
 
 ```bash
-npx skills add truefoundry/skills -g -a cursor -s integrate-gateway -y
+npx skills add truefoundry/skills --agent cursor --skill integrate-gateway --yes --global
 ```
 
 ## Manual (any agent)

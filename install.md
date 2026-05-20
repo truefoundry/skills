@@ -1,5 +1,29 @@
 # TrueFoundry Skills Install
 
+## Installation
+
+### Quick Install
+
+Using `npx skills`:
+
+Local (current project):
+
+```bash
+npx skills add truefoundry/skills --skill '*' --yes
+```
+
+Global (all projects):
+
+```bash
+npx skills add truefoundry/skills --skill '*' --yes --global
+```
+
+To link skills to a specific agent, for example Claude Code:
+
+```bash
+npx skills add truefoundry/skills --agent claude-code --skill '*' --yes --global
+```
+
 Paste this into Claude Code, Codex, Cursor, or any coding agent that can read a URL:
 
 > Read https://raw.githubusercontent.com/truefoundry/skills/main/install.md and follow the instructions to register with TrueFoundry.
