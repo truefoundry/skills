@@ -8,33 +8,19 @@ This is the official skills repo — it lets your coding agent set up and manage
 
 ### Quick Install
 
-Using `npx skills`:
-
-Local (current project):
+Open terminal and install truefoundry skills:
 
 ```bash
-npx skills add truefoundry/skills --skill '*' --yes
+npx skills add truefoundry/skills --yes
 ```
 
-Global (all projects):
-
-```bash
-npx skills add truefoundry/skills --skill '*' --yes --global
-```
-
-To link skills to a specific agent, for example Claude Code:
-
-```bash
-npx skills add truefoundry/skills --agent claude-code --skill '*' --yes --global
-```
-
-Then open Claude Code, Codex, or Cursor and say:
+To create an account, open Claude Code, Codex, or Cursor and say:
 
 ```text
 sign me up for truefoundry
 ```
 
-The agent will check the CLI, walk you through account creation if needed, run `tfy login --host <tenant-url>`, and stop once login is verified.
+The harness will check the CLI, walk you through account creation if needed, run `tfy login --host <tenant-url>`, and stop once login is verified.
 
 <details>
 <summary><strong>Install the plugin</strong></summary>
@@ -54,29 +40,19 @@ codex plugin marketplace add truefoundry/skills
 
 Then open the plugin list with `/plugins` and install `truefoundry`.
 
-**Cursor**
-
-For local testing:
-
-```bash
-git clone https://github.com/truefoundry/skills.git ~/.cursor/plugins/local/truefoundry
-```
-
-For team-wide: import `https://github.com/truefoundry/skills` from Dashboard → Settings → Plugins → Import.
-
 </details>
 
 ## What you can ask
 
 - *"scan this codebase and migrate all LLM calls to the gateway"*
 - *"add a PII guardrail to my gateway"*
-- *"set up model routing for gpt-4 and claude-3"*
+- *"attach gpt 5.5 to llm gateway"*
+- *"set up model routing for gpt 5.5 and sonnet 4.6"*
 - *"configure rate limits for my model"*
-- *"show my gateway usage and costs"*
+- *"show my gateway usage and costs in the last 3 months"*
 - *"register an MCP server"*
 - *"create a prompt in the prompt registry"*
 - *"publish a skill to the Skills Registry"*
-- *"create and publish an agent"*
 
 ## Skills
 
