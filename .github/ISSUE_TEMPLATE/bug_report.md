@@ -5,7 +5,7 @@ labels: bug
 ---
 
 **Skill name**
-Which skill is affected? (e.g., deploy, llm-deploy, helm)
+Which skill is affected? (e.g., gateway, integrate-gateway, onboard)
 
 **What happened?**
 Brief description of the issue.
@@ -20,4 +20,4 @@ What should have happened.
 **Environment**
 - Agent: (Claude Code / Cursor / Codex / other)
 - OS: (macOS / Linux / Windows)
-- MCP server: (yes / no)
+- TrueFoundry CLI version: (`tfy --version`, if installed)

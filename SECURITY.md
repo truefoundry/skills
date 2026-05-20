@@ -20,7 +20,7 @@ Please include:
 This policy applies to:
 - Skill instructions under `skills/*/SKILL.md`
 - Shared scripts and references under `skills/_shared/`
-- Installer and helper scripts under `scripts/` and `hooks/`
+- Installer and helper scripts under `scripts/`
 
 ## Response Process
 

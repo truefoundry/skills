@@ -15,7 +15,7 @@ For enterprise customers:
 Please include:
 - Agent type (Codex, Claude Code, Cursor, etc.)
 - OS and shell
-- Relevant environment setup (`TFY_BASE_URL`, whether `TFY_API_KEY` is set)
+- Relevant environment setup (`TFY_BASE_URL`, `TFY_HOST`, whether `TFY_API_KEY` is set)
 - Steps to reproduce
 - Expected behavior vs actual behavior
 

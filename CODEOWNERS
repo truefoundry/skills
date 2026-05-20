@@ -4,4 +4,3 @@
 # Shared files require extra review
 skills/_shared/ @truefoundry/agent-skills
 scripts/ @truefoundry/agent-skills
-hooks/ @truefoundry/agent-skills

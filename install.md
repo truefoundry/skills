@@ -1,40 +1,34 @@
-# TrueFoundry Skills Install
+# Install TrueFoundry Skills
 
-## Installation
+## Install All Skills
 
-### Quick Install
-
-Using `npx skills`:
-
-Local (current project):
+Local project:
 
 ```bash
 npx skills add truefoundry/skills --skill '*' --yes
 ```
 
-Global (all projects):
+Global:
 
 ```bash
 npx skills add truefoundry/skills --skill '*' --yes --global
 ```
 
-To link skills to a specific agent, for example Claude Code:
+## Onboard
 
-```bash
-npx skills add truefoundry/skills --agent claude-code --skill '*' --yes --global
+After installing, tell your coding agent:
+
+```text
+sign me up for truefoundry
 ```
 
-Paste this into Claude Code, Codex, Cursor, or any coding agent that can read a URL:
+The agent should use `truefoundry-onboard` and follow this flow:
 
-> Read https://raw.githubusercontent.com/truefoundry/skills/main/install.md and follow the instructions to register with TrueFoundry.
+1. Verify the TrueFoundry CLI is installed.
+2. Check whether `tfy login` is already complete.
+3. If login is missing, open `https://www.truefoundry.com/register`.
+4. Ask for the tenant URL after signup.
+5. Run `tfy login --host <tenant-url>`.
+6. Verify CLI login before using other TrueFoundry skills.
 
-The agent should use the `truefoundry-onboard` skill and follow this exact flow:
-
-1. Check whether `tfy login` is already complete.
-2. If not, send the user to https://www.truefoundry.com/register.
-3. Ask the user to come back with their tenant URL.
-4. Install or verify the TrueFoundry CLI.
-5. Ask the user to run `tfy login --host <tenant-url>`.
-6. Verify CLI login before invoking any other TrueFoundry skill.
-
-Stop after CLI login verification. Operational setup belongs to the other TrueFoundry skills.
+Stop after CLI login verification. Operational setup belongs to the other skills.
