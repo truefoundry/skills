@@ -164,7 +164,7 @@ Supported providers reference: [references/guardrail-providers.md](references/gu
 
 ## AI Monitoring
 
-Query gateway request traces via the spans API. Requires either `tracingProjectFqn` or `dataRoutingDestination` (suggest `"default"` as starting point).
+Query gateway request traces via the spans API and aggregate usage via the metrics API. Requires either `tracingProjectFqn` or `dataRoutingDestination` for trace queries; suggest `"default"` as a starting point when the user does not know the destination.
 
 ### Recent Requests
 
@@ -183,6 +183,13 @@ For all monitoring use cases (cost analysis, errors, model usage, user filtering
 
 ### Aggregated Metrics
 
+Use this path for aggregate questions such as:
+
+- "Show cost incurred for the last 3 months."
+- "Break cost down by model, user, team, or virtual account."
+- "Show total tokens and latency by model."
+- "Which virtual account generated the most cost?"
+
 ```bash
 $TFY_API_SH POST /api/svc/v1/llm-gateway/metrics/query '{
   "startTs": "...", "endTs": "...",
@@ -192,6 +199,8 @@ $TFY_API_SH POST /api/svc/v1/llm-gateway/metrics/query '{
   "groupBy": ["modelName"]
 }'
 ```
+
+When answering a time-range question, calculate exact `startTs` and `endTs`, state the range used, and present totals in a compact table. If the user asks for monthly breakdowns, run one query per month unless the API exposes a time-bucket field.
 
 ---
 

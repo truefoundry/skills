@@ -1,6 +1,6 @@
 # Secrets & Access Tokens
 
-Manage secret groups, secret references (tfy-secret://), and personal access tokens (PATs).
+Manage secret groups, secret references (tfy-secret://), personal access tokens (PATs), and virtual accounts/VATs.
 
 ## Secrets
 
@@ -164,3 +164,55 @@ Never commit tokens to Git or share them in plain text.
 ### Delete Access Token
 
 Do not delete PATs from the agent. If deletion is requested, direct the user to the TrueFoundry dashboard.
+
+## Virtual Accounts and VATs
+
+Use virtual accounts when the user needs a machine or application identity with controlled model access. VAT token values are credentials and follow the same one-time display policy as PATs.
+
+### List Virtual Accounts
+
+```bash
+$TFY_API_SH GET /api/svc/v1/virtual-accounts
+```
+
+Present:
+
+```text
+Virtual Accounts:
+| Name | ID | Models/Scopes | Created At |
+|------|----|---------------|------------|
+```
+
+### Create or Update Virtual Account
+
+Before creating or updating, collect:
+
+- Name
+- Intended owner/application
+- Allowed models or resources, if the API/dashboard requires them
+- Expiration or rotation expectations, if applicable
+
+Show the final payload without token values and ask for explicit confirmation.
+
+```bash
+$TFY_API_SH POST /api/svc/v1/virtual-accounts '{"name":"ci-gateway-client"}'
+```
+
+### Retrieve or Regenerate VAT Token
+
+Only retrieve or regenerate when the user explicitly asks and is ready to handle the credential.
+
+```bash
+$TFY_API_SH GET /api/svc/v1/virtual-accounts/VIRTUAL_ACCOUNT_ID/token
+$TFY_API_SH POST /api/svc/v1/virtual-accounts/VIRTUAL_ACCOUNT_ID/regenerate-token
+```
+
+Show only a masked preview by default. Reveal the full token once only after explicit confirmation.
+
+### Delete Virtual Account
+
+Do not delete virtual accounts from the agent. If deletion is requested, direct the user to the dashboard.
+
+## Service Accounts
+
+Existing service accounts can be used as collaborator subjects with `serviceaccount:name`. This skill does not currently document a verified service-account creation endpoint. Do not claim service-account creation is supported until the dashboard flow or API endpoint is verified.

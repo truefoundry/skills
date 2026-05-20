@@ -349,6 +349,7 @@ $TFY_API_SH GET /api/svc/v1/workspaces
 | GET | `/api/svc/v1/teams` | List teams |
 | POST | `/api/svc/v1/teams` | Create a team |
 | GET | `/api/svc/v1/teams/{id}` | Get team |
+| POST | `/api/svc/v1/teams/{id}/members` | Add member to team |
 | DELETE | `/api/svc/v1/teams/{id}` | Delete team |
 
 ---
@@ -360,6 +361,8 @@ $TFY_API_SH GET /api/svc/v1/workspaces
 | GET | `/api/svc/v1/users` | List users |
 | GET | `/api/svc/v1/users/{id}` | Get user |
 | POST | `/api/svc/v1/users/invite` | Invite user |
+
+Invite and access grants are separate: invite with `/users/invite`, then add collaborators to resources after confirming role/resource.
 
 ---
 
@@ -383,6 +386,8 @@ $TFY_API_SH GET /api/svc/v1/workspaces
 | GET | `/api/svc/v1/virtual-accounts/{id}/token` | Get VAT token |
 | POST | `/api/svc/v1/virtual-accounts/{id}/regenerate-token` | Regenerate token |
 | DELETE | `/api/svc/v1/virtual-accounts/{id}` | Delete virtual account |
+
+Service accounts are valid collaborator subjects as `serviceaccount:name`, but this reference does not currently include a verified service-account creation endpoint.
 
 ---
 

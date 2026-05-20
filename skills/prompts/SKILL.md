@@ -45,6 +45,17 @@ TrueFoundry Dashboard -> AI Gateway -> Prompt Management / Prompt Registry
 
 Use the UI when the user wants to visually create, compare, or test prompts.
 
+## Capability Matrix
+
+| User intent | Supported path | Notes |
+|-------------|----------------|-------|
+| List prompts | API or UI | Present prompt name, ID, latest version, and tags. |
+| Inspect prompt versions | API, SDK, or UI | Include version ID/FQN and tags. |
+| Create a prompt | SDK or UI | Review messages/settings before creation. |
+| Update a prompt | SDK or UI | Treat as a new version; do not overwrite silently. |
+| Tag a version | SDK or UI | Confirm before moving stable tags like `production`. |
+| Get prompt FQN | SDK or UI | Use for Gateway and Agent references. |
+
 ## List Prompts
 
 API fallback:
@@ -76,6 +87,30 @@ Collect:
 
 Show the final prompt content and settings before creating or updating.
 
+Review format before create/update:
+
+```text
+Prompt Change
+| Field | Value |
+|-------|-------|
+| Name | my-prompt |
+| Repository | ml-repo-fqn |
+| Change | create prompt / create new version |
+| Variables | user_input |
+| Model | model-catalog:openai:gpt-4 |
+| Tags | none / production |
+```
+
+Then show the messages in order:
+
+```text
+System:
+...
+
+User:
+...
+```
+
 SDK shape:
 
 ```python
@@ -100,6 +135,8 @@ client.prompts.create_or_update(
 ## Versioning and Tags
 
 Prompt edits create versions. Use tags such as `production` or `staging` to provide stable references.
+
+Before applying a tag, show the current tag target if known and ask for explicit confirmation when the tag is stable or production-facing.
 
 SDK shape:
 
