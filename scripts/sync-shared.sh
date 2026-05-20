@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Sync shared files from _shared/ to each skill directory.
+# Link shared files from _shared/ into each skill directory.
 # Run after editing files in skills/_shared/.
 # Must be run from the repository root (directory containing scripts/ and skills/).
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -21,25 +21,18 @@ for skill_dir in "$SKILLS_DIR"/*/; do
   [[ "$skill_name" == onboard ]] && continue
   [ -f "$skill_dir/SKILL.md" ] || continue
 
-  # Sync scripts
-  if [ -d "$SHARED_DIR/scripts" ]; then
-    mkdir -p "$skill_dir/scripts"
-    cp -R "$SHARED_DIR"/scripts/* "$skill_dir/scripts/" 2>/dev/null || true
-  fi
-
-  # Sync references
-  if [ -d "$SHARED_DIR/references" ]; then
-    mkdir -p "$skill_dir/references"
-    cp -R "$SHARED_DIR"/references/* "$skill_dir/references/" 2>/dev/null || true
-  fi
+  while IFS= read -r shared_file; do
+    rel_path="${shared_file#"$SHARED_DIR"/}"
+    target="$skill_dir/$rel_path"
+    mkdir -p "$(dirname "$target")"
+    rm -f "$target"
+    ln -s "../../_shared/$rel_path" "$target"
+  done < <(find "$SHARED_DIR" -type f | sort)
 
   count=$((count + 1))
 done
 
-# Make scripts executable
-find "$SKILLS_DIR"/*/scripts -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
-
-# Verify copies match canonical source
+# Verify links point to the canonical source.
 errors=0
 for skill_dir in "$SKILLS_DIR"/*/; do
   skill_name=$(basename "$skill_dir")
@@ -51,16 +44,27 @@ for skill_dir in "$SKILLS_DIR"/*/; do
     [ -f "$shared_file" ] || continue
     rel_path="${shared_file#"$SHARED_DIR"/}"
     target="$skill_dir/$rel_path"
-    if [ -f "$target" ] && ! cmp -s "$shared_file" "$target"; then
-      echo "ERROR: $skill_name/$rel_path differs from _shared/" >&2
+    expected="../../_shared/$rel_path"
+    if [ ! -L "$target" ]; then
+      echo "ERROR: $skill_name/$rel_path is not a symlink to _shared/" >&2
+      errors=$((errors + 1))
+      continue
+    fi
+    if [ "$(readlink "$target")" != "$expected" ]; then
+      echo "ERROR: $skill_name/$rel_path points to $(readlink "$target"), expected $expected" >&2
+      errors=$((errors + 1))
+      continue
+    fi
+    if [ ! -e "$target" ]; then
+      echo "ERROR: $skill_name/$rel_path is a broken symlink" >&2
       errors=$((errors + 1))
     fi
   done
 done
 
 if [ "$errors" -gt 0 ]; then
-  echo "FAILED: $errors files out of sync after copy" >&2
+  echo "FAILED: $errors shared links are invalid" >&2
   exit 1
 fi
 
-echo "Synced shared files to $count skills."
+echo "Linked shared files into $count skills."

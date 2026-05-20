@@ -76,7 +76,7 @@ while IFS= read -r skill_md; do
 
 done < <(find "$SKILLS_DIR" -mindepth 2 -maxdepth 2 -name SKILL.md | sort)
 
-echo "Validating shared file sync..."
+echo "Validating shared file links..."
 
 while IFS= read -r shared_file; do
   rel_path="${shared_file#"$SKILLS_DIR/_shared/"}"
@@ -85,12 +85,21 @@ while IFS= read -r shared_file; do
     [[ "$skill_name" == _shared ]] && continue
     [[ "$skill_name" == onboard ]] && continue
     target="$skill_dir/$rel_path"
-    if [[ ! -f "$target" ]]; then
-      fail "missing shared file copy: $target"
+    expected="../../_shared/$rel_path"
+    if [[ ! -L "$target" ]]; then
+      fail "missing shared file symlink: $target"
+      continue
+    fi
+    if [[ "$(readlink "$target")" != "$expected" ]]; then
+      fail "shared file symlink has wrong target: $target -> $(readlink "$target") expected $expected"
+      continue
+    fi
+    if [[ ! -e "$target" ]]; then
+      fail "broken shared file symlink: $target"
       continue
     fi
     if ! cmp -s "$shared_file" "$target"; then
-      fail "shared file drift: $target differs from _shared/$rel_path"
+      fail "shared file symlink content mismatch: $target"
     fi
   done < <(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d | sort)
 done < <(find "$SKILLS_DIR/_shared" -type f | sort)

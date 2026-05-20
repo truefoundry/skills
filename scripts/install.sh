@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# TrueFoundry Agent Skills installer
+# TrueFoundry Skills installer
 #
 # Install:  curl -fsSL https://raw.githubusercontent.com/truefoundry/skills/main/scripts/install.sh | bash
 # Options:  ... | bash -s -- [--global] [--local] [--agents claude,cursor,codex]
@@ -13,30 +13,22 @@ DEFAULT_REF="$BRANCH"
 SOURCE_REF="${TFY_SKILLS_REF:-$DEFAULT_REF}"
 EXPECTED_SHA256="${TFY_SKILLS_SHA256:-}"
 
-# ── Colours ──────────────────────────────────────────────────────────────────
 BOLD=$'\033[1m'  DIM=$'\033[2m'
 RED=$'\033[31m'  GREEN=$'\033[32m'  YELLOW=$'\033[33m'
-MAGENTA=$'\033[35m'  CYAN=$'\033[36m'  NC=$'\033[0m'
+CYAN=$'\033[36m'  NC=$'\033[0m'
 
 info()      { printf '%s> %s%s\n' "$BOLD" "$*" "$NC"; }
 warn()      { printf '%s!%s %s\n' "$YELLOW" "$NC" "$*"; }
 error()     { printf '%sx %s%s\n' "$RED" "$*" "$NC" >&2; }
-ok()        { printf '%s✓%s %s\n' "$GREEN" "$NC" "$*"; }
+ok()        { printf '%sOK%s %s\n' "$GREEN" "$NC" "$*"; }
 
 banner() {
-  printf '\n%s' "$MAGENTA"
-  cat <<'BANNER'
-  ╔════════════════════════════════════════╗
-  ║     TrueFoundry Skills Installed!     ║
-  ╚════════════════════════════════════════╝
-BANNER
-  printf '%s\n' "$NC"
+  printf '\n%sTrueFoundry Skills Installed%s\n\n' "$BOLD" "$NC"
 }
 
-# ── Supported agents ─────────────────────────────────────────────────────────
 # Format: config_dir|skills_subdir|display_name
-#   config_dir   — parent dir whose existence means the agent is installed
-#   skills_subdir — where skills go (relative to $HOME for global, CWD for local)
+# config_dir: parent directory whose existence means the agent is installed.
+# skills_subdir: install path relative to $HOME for global or CWD for local.
 AGENTS_GLOBAL=(
   ".claude|.claude/skills|Claude Code"
   ".cursor|.cursor/skills|Cursor"
@@ -54,9 +46,8 @@ SKILL_NAMES=(
 
 # Shared files (relative to _shared/ in source)
 SHARED_SCRIPTS=( "scripts/tfy-api.sh" "scripts/tfy-version.sh" )
-SHARED_REFS=( "references/api-endpoints.md" "references/prerequisites.md" "references/tfy-api-setup.md" "references/intent-clarification.md" "references/cli-fallback.md" )
+SHARED_REFS=( "references/api-endpoints.md" "references/cli-fallback.md" "references/cli-reference.md" "references/intent-clarification.md" "references/prerequisites.md" "references/tfy-api-setup.md" )
 
-# ── Parse args ───────────────────────────────────────────────────────────────
 MODE=""            # "" = auto (global + local if applicable), "global", "local"
 FILTER_AGENTS=""   # comma-separated agent names to restrict to
 REF_SET_BY_ARG=0
@@ -92,7 +83,6 @@ EOF
   esac
 done
 
-# ── Agent filtering helper ───────────────────────────────────────────────────
 agent_allowed() {
   local name="$1"
   [ -z "$FILTER_AGENTS" ] && return 0
@@ -130,7 +120,6 @@ download_to_file() {
   fi
 }
 
-# ── Download source ──────────────────────────────────────────────────────────
 # Sets SOURCE_DIR (global) instead of echoing, to avoid subshell issues with
 # trap/cleanup when called via $(get_source).
 resolve_source() {
@@ -187,7 +176,6 @@ resolve_source() {
   SOURCE_DIR="$extracted"
 }
 
-# ── Install skills into a target directory ───────────────────────────────────
 install_skills() {
   local target_dir="$1"   # e.g. ~/.claude/skills
   local label="$2"        # e.g. "Claude Code"
@@ -210,7 +198,7 @@ install_skills() {
   done
   chmod +x "$target_dir"/_shared/scripts/*.sh 2>/dev/null || true
 
-  # Install each skill: SKILL.md + symlinks to _shared
+  # Install each skill: SKILL.md + local references/scripts paths.
   local count=0
   for skill in "${SKILL_NAMES[@]}"; do
     local src="$src_skills/$skill"
@@ -220,18 +208,47 @@ install_skills() {
     mkdir -p "$dest"
     cp "$src/SKILL.md" "$dest/SKILL.md"
 
-    # Symlink scripts/ to _shared
-    ln -sfn ../_shared/scripts "$dest/scripts"
+    # For scripts: if the skill has extra scripts beyond _shared, copy shared
+    # scripts plus only skill-specific scripts; otherwise symlink to _shared/scripts.
+    local has_extra_scripts=false
+    if [ -d "$src/scripts" ]; then
+      for script_file in "$src/scripts"/*; do
+        [ -e "$script_file" ] || continue
+        local script_name
+        script_name="$(basename "$script_file")"
+        if [ ! -e "$src_skills/_shared/scripts/$script_name" ]; then
+          has_extra_scripts=true
+          break
+        fi
+      done
+    fi
 
-    # For references: if the skill has extra files beyond _shared, copy all;
-    # otherwise just symlink to _shared/references
+    if [ "$has_extra_scripts" = true ]; then
+      rm -f "$dest/scripts" 2>/dev/null || true
+      mkdir -p "$dest/scripts"
+      cp "$target_dir"/_shared/scripts/* "$dest/scripts/" 2>/dev/null || true
+      for script_file in "$src/scripts"/*; do
+        [ -e "$script_file" ] || continue
+        local script_name
+        script_name="$(basename "$script_file")"
+        if [ ! -e "$src_skills/_shared/scripts/$script_name" ]; then
+          cp "$script_file" "$dest/scripts/"
+        fi
+      done
+      chmod +x "$dest"/scripts/*.sh 2>/dev/null || true
+    else
+      ln -sfn ../_shared/scripts "$dest/scripts"
+    fi
+
+    # For references: if the skill has extra files beyond _shared, copy shared
+    # refs plus only skill-specific refs; otherwise symlink to _shared/references.
     local has_extra=false
     if [ -d "$src/references" ]; then
       for ref_file in "$src/references"/*; do
-        [ -f "$ref_file" ] || continue
+        [ -e "$ref_file" ] || continue
         local ref_name
         ref_name="$(basename "$ref_file")"
-        if [ ! -f "$src_skills/_shared/references/$ref_name" ]; then
+        if [ ! -e "$src_skills/_shared/references/$ref_name" ]; then
           has_extra=true
           break
         fi
@@ -243,24 +260,30 @@ install_skills() {
       rm -f "$dest/references" 2>/dev/null || true
       mkdir -p "$dest/references"
       cp "$target_dir"/_shared/references/* "$dest/references/" 2>/dev/null || true
-      cp "$src/references"/* "$dest/references/" 2>/dev/null || true
+      for ref_file in "$src/references"/*; do
+        [ -e "$ref_file" ] || continue
+        local ref_name
+        ref_name="$(basename "$ref_file")"
+        if [ ! -e "$src_skills/_shared/references/$ref_name" ]; then
+          cp -R "$ref_file" "$dest/references/"
+        fi
+      done
     else
       ln -sfn ../_shared/references "$dest/references"
     fi
 
-    # Validate symlinks/copies resolve to real files
+    # Validate installed scripts resolve to real files.
     if [ ! -e "$dest/scripts/tfy-api.sh" ]; then
-      error "$label: Broken symlink for $skill/scripts — check permissions"
+      error "$label: Broken symlink for $skill/scripts - check permissions"
       continue
     fi
 
     count=$((count + 1))
   done
 
-  ok "$label: ${GREEN}$count${NC} skills ${DIM}→${NC} ${CYAN}$target_dir${NC}"
+  ok "$label: $count skills -> ${CYAN}$target_dir${NC}"
 }
 
-# ── Detect and install ───────────────────────────────────────────────────────
 detect_and_install() {
   local base="$1"    # $HOME for global, $(pwd) for local
   local suffix="$2"  # "" for global, " (project)" for local
@@ -274,7 +297,7 @@ detect_and_install() {
 
     # Extract short agent name from config_dir for filtering
     local agent_name="${config_dir##*/}"
-    agent_name="${agent_name#.}"  # strip leading dot (.claude → claude)
+    agent_name="${agent_name#.}"
 
     agent_allowed "$agent_name" || continue
 
@@ -287,7 +310,6 @@ detect_and_install() {
   return $((found == 0))
 }
 
-# ── Main ─────────────────────────────────────────────────────────────────────
 _CLEANUP_DIR=""
 cleanup() { rm -rf "${_CLEANUP_DIR:-}"; }
 trap cleanup EXIT
@@ -320,14 +342,14 @@ if [ "$installed" -eq 0 ]; then
   for entry in "${AGENTS_GLOBAL[@]}"; do
     local_display="${entry##*|}"
     local_config="${entry%%|*}"
-    printf '    %s•%s %-14s %s~/%s%s\n' "$DIM" "$NC" "$local_display" "$DIM" "$local_config" "$NC"
+    printf '    %s-%s %-14s %s~/%s%s\n' "$DIM" "$NC" "$local_display" "$DIM" "$local_config" "$NC"
   done
   printf '\n  Install an agent first, or use %s--agents%s to specify.\n\n' "$CYAN" "$NC"
   exit 1
 fi
 
 banner
-printf '  %sShared files in %s_shared/%s — update once, all skills use it.%s\n\n' "$DIM" "$CYAN" "$DIM" "$NC"
+printf '  %sShared files in %s_shared/%s - update once, all skills use it.%s\n\n' "$DIM" "$CYAN" "$DIM" "$NC"
 warn "Restart your agent to load skills."
 printf "\n"
 info "Run again anytime to update: ${DIM}curl -fsSL https://raw.githubusercontent.com/$REPO/$BRANCH/scripts/install.sh | bash${NC}"

@@ -1,78 +1,53 @@
 # TrueFoundry Skills
 
-[TrueFoundry AI Gateway](https://truefoundry.com) is the proxy layer that sits between your applications and LLM providers and MCP servers. It's an enterprise-grade platform that gives you access to 1000+ LLMs through a unified interface while handling observability and governance.
+TrueFoundry Skills let coding agents configure and operate TrueFoundry AI Gateway through plain English.
 
-This is the official skills repo — it lets your coding agent set up and manage the gateway through plain English.
-
-## Installation
-
-### Quick Install
-
-Open terminal and install truefoundry skills:
+## Install
 
 ```bash
 npx skills add truefoundry/skills --yes
 ```
 
-To create an account, open Claude Code, Codex, or Cursor and say:
+Then tell your coding agent:
 
 ```text
 sign me up for truefoundry
 ```
 
-The harness will check the CLI, walk you through account creation if needed, run `tfy login --host <tenant-url>`, and stop once login is verified.
+The onboarding skill verifies the TrueFoundry CLI, sends you to browser signup if needed, runs `tfy login --host <tenant-url>`, and stops once login is verified.
 
-<details>
-<summary><strong>Install the plugin</strong></summary>
+## What You Can Ask
 
-**Claude Code**
-
-```shell
-/plugin marketplace add truefoundry/skills
-/plugin install truefoundry@truefoundry-skills
-```
-
-**Codex**
-
-```shell
-codex plugin marketplace add truefoundry/skills
-```
-
-Then open the plugin list with `/plugins` and install `truefoundry`.
-
-</details>
-
-## What you can ask
-
-- *"scan this codebase and migrate all LLM calls to the gateway"*
-- *"add a PII guardrail to my gateway"*
-- *"attach gpt 5.5 to llm gateway"*
-- *"set up model routing for gpt 5.5 and sonnet 4.6"*
-- *"configure rate limits for my model"*
-- *"show my gateway usage and costs in the last 3 months"*
-- *"register an MCP server"*
-- *"create a prompt in the prompt registry"*
-- *"publish a skill to the Skills Registry"*
+- "scan this codebase and migrate all LLM calls to the gateway"
+- "add a PII guardrail to my gateway"
+- "set up model routing for gpt 5.5 and sonnet 4.6"
+- "configure rate limits for my model"
+- "show my gateway usage and costs in the last 3 months"
+- "register an MCP server"
+- "create a prompt in the prompt registry"
+- "publish a skill to the Skills Registry"
 
 ## Skills
 
 | Skill | What it does |
 |-------|-------------|
-| `gateway` | Model routing, providers, guardrails, rate limits, budget controls |
-| `integrate-gateway` | Integrates a codebase with the AI Gateway — scans, plans, migrates, verifies |
-| `observability` | Usage dashboards, logs, OpenTelemetry tracing |
-| `platform` | CLI login, workspaces, clusters, secrets, access control |
-| `mcp-servers` | Create and manage remote, virtual, and hosted MCP servers |
-| `prompts` | Prompt registry — versioning, tagging, references |
-| `agents` | Agent registry — create, test, publish, attach MCP servers |
-| `skills-registry` | Publish and version reusable agent skills |
-| `onboard` | First-time setup flow — registration through login verification |
+| `onboard` | First-time account and CLI login setup |
+| `gateway` | Model routing, providers, guardrails, rate limits, budgets |
+| `integrate-gateway` | Codebase scans and migration to AI Gateway |
+| `observability` | Gateway usage, traces, cost, and error analysis |
+| `platform` | Workspaces, secrets, access control, tokens, CLI preflight |
+| `mcp-servers` | Remote, virtual, hosted, and OpenAPI MCP servers |
+| `prompts` | Prompt registry management |
+| `agents` | TrueFoundry Agent Registry workflows |
+| `skills-registry` | Publishing reusable agent skills |
 
-## Architecture
+## Repo Shape
 
-```
+```text
 truefoundry/skills/
-├── skills/              ← shared skill definitions (all agents read these)
+├── skills/
+│   ├── _shared/          # canonical shared references and scripts
+│   ├── onboard/
 │   ├── gateway/
 │   ├── integrate-gateway/
 │   ├── observability/
@@ -80,33 +55,25 @@ truefoundry/skills/
 │   ├── mcp-servers/
 │   ├── prompts/
 │   ├── agents/
-│   ├── skills-registry/
-│   └── onboard/
-├── agents/              ← subagent definitions (Claude Code)
-├── hooks/               ← event hooks (credential bootstrap, secret scanning)
-├── commands/            ← slash commands
-├── rules/               ← Cursor .mdc rules
-├── .claude-plugin/      ← Claude Code manifest
-├── .codex-plugin/       ← Codex manifest
-└── .cursor-plugin/      ← Cursor manifest
+│   └── skills-registry/
+└── scripts/              # install, shared-link, and validation scripts
 ```
 
-## Hooks
+Shared files are maintained once in `skills/_shared/`. Individual skill folders expose local `references/...` and `scripts/...` paths through symlinks so agents can load nearby files normally.
 
-Three hooks run automatically on Claude Code and Codex:
+## Development
 
-- **Session start** — verifies tenant config, installs CLI if missing
-- **Block deletes** — prevents DELETE API calls, redirects to dashboard
-- **Secret scan** — blocks hardcoded API keys, enforces `tfy-secret://` references
+```bash
+./scripts/sync-shared.sh
+./scripts/validate-skills.sh
+./scripts/validate-skill-security.sh
+./scripts/test-tfy-api.sh
+```
 
-## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md) for skill authoring rules.
 
-Bug fixes, doc improvements, and new skills are welcome. If you're adding a skill, follow the structure in `skills/gateway/` as a reference.
+## Links
 
----
-
-[TrueFoundry](https://truefoundry.com) | [Docs](https://docs.truefoundry.com) | [Register](https://truefoundry.com/register)
-
-## License
-
-MIT
+- [TrueFoundry](https://truefoundry.com)
+- [Docs](https://docs.truefoundry.com)
+- [Register](https://truefoundry.com/register)

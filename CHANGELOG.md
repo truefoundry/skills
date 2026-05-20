@@ -1,20 +1,24 @@
 # Changelog
 
-All notable changes to this project are documented in this file.
-
-## [Unreleased]
-
-### Added
-- Production validation script: `scripts/validate-skills.sh`.
-- Runtime failure-mode tests: `scripts/test-tfy-api.sh`.
-- OSS governance docs: `SECURITY.md`, `CODE_OF_CONDUCT.md`, `SUPPORT.md`.
-- Shared intent-clarification reference templates: `skills/_shared/references/intent-clarification.md`.
+## Unreleased
 
 ### Changed
-- Hardened `skills/_shared/scripts/tfy-api.sh` to fail on HTTP errors and use stricter shell settings.
-- CI now enforces validation and runtime tests.
-- Updated docs for OSS readiness: corrected shared reference file list in `AGENTS.md`, expanded testing steps in `CONTRIBUTING.md`, improved PR checklist accuracy, clarified prerequisites and policy links in `README.md`, and tightened reporting guidance in `SECURITY.md`/`SUPPORT.md`/`CODE_OF_CONDUCT.md`.
-- Skill routing guidance now uses clarifying questions for ambiguous intents (for example, Postgres: Helm vs containerized service).
 
-### Fixed
-- Consistent primary deployment skill policy across docs.
+- Simplified the repo to a skills-only package.
+- Removed plugin manifests, plugin scripts, top-level agent definitions, slash commands, runtime hooks, and Cursor rules.
+- Centralized shared references and helper scripts under `skills/_shared/`.
+- Replaced repeated shared files in skill folders with symlinks.
+- Updated installer and validation scripts for the shared-symlink layout.
+- Simplified install and contribution documentation.
+
+### Removed
+
+- `.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`
+- `.cursor/rules/`
+- `agents/`
+- `commands/`
+- `hooks/`
+- `plugin-scripts/`
+- `rules/`
+- per-skill install pages
+- pull request template

@@ -16,8 +16,7 @@ jobs:
 
       - name: Shellcheck scripts
         run: |
-          shellcheck scripts/*.sh hooks/auto-approve-tfy-api.sh skills/_shared/scripts/tfy-api.sh
-          shellcheck plugin-scripts/*.sh
+          shellcheck scripts/*.sh skills/_shared/scripts/tfy-api.sh
           find skills -mindepth 2 -name '*.sh' -print0 | xargs -0 -r shellcheck
 
       - name: Validate skills
