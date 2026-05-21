@@ -35,6 +35,17 @@ Use this skill when the user wants to:
    - `tfy apply`: declarative/GitOps flow when an `agent-skill` manifest is available.
    - Multi-file bundles: use the dashboard/registry workflow or exact product-provided command only after verifying it exists in `tfy --help`.
 
+## Capability Matrix
+
+| User intent | Supported path | Notes |
+|-------------|----------------|-------|
+| Create a single-file skill | UI | Use the dashboard editor for `SKILL.md`. |
+| Publish a reviewed `SKILL.md` | UI or `tfy apply` | Use `tfy apply` only when a valid `agent-skill` manifest is available. |
+| Upload a multi-file bundle | Dashboard/registry workflow | Verify any generated command before running it. |
+| Download a skill | Skill detail usage/export flow | Inspect downloaded files before editing. |
+| Create a new version | Skill detail UI or apply workflow | Show changed content before publishing. |
+| Attach a skill to an agent | Agent Playground | Use `truefoundry-agents` for agent-side changes. |
+
 ## UI Path
 
 Use this path for single-file skills:
@@ -78,6 +89,15 @@ Show the user the file list and ask for confirmation before publishing.
 
 Do not run `tfy upload skill`; it is not present in `tfy 0.13.12`. If the product UI shows a generated command in the future, verify it with `tfy --help` before using it.
 
+Before publishing a multi-file bundle, review:
+
+- `SKILL.md` frontmatter has a focused `name`, action-oriented `description`, compatibility, and minimal `allowed-tools`.
+- Instructions are sequential and specific.
+- Large reference material lives in `references/` and is linked from `SKILL.md`.
+- Scripts live in `scripts/` and are preferred over long pasted command blocks.
+- Secrets, tenant URLs, and raw tokens are not embedded in examples.
+- Destructive actions are dashboard-only or require explicit user confirmation.
+
 ## Declarative Apply
 
 Use `tfy apply` for GitOps-style skill publishing. Before final apply, show:
@@ -88,6 +108,8 @@ Use `tfy apply` for GitOps-style skill publishing. Before final apply, show:
 - Exact command.
 
 Then ask for explicit confirmation.
+
+If the manifest schema is unknown, stop at a reviewed draft and ask the user to publish through the UI or provide the product-generated manifest. Do not invent resource fields.
 
 ## Download Existing Skill
 

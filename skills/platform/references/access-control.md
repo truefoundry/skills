@@ -4,6 +4,33 @@ Manage roles, teams, and collaborators. Roles define permission sets, teams grou
 
 When using direct API, set `TFY_API_SH` to the full path of this skill's `scripts/tfy-api.sh`. See `references/tfy-api-setup.md` for paths per agent.
 
+### Users
+
+Use user workflows for listing existing users and inviting new users by email. Inviting a user and granting access are separate steps.
+
+#### List Users
+
+```bash
+$TFY_API_SH GET /api/svc/v1/users
+```
+
+#### Invite Users by Email
+
+Before inviting, collect the email addresses and confirm the target tenant. If the user also wants workspace or resource access, complete the invite first, then use the collaborator workflow after confirming the role and resource.
+
+```bash
+$TFY_API_SH POST /api/svc/v1/users/invite '{"emails":["alice@example.com","bob@example.com"]}'
+```
+
+Present:
+
+```text
+Invites:
+| Email | Status |
+|-------|--------|
+| alice@example.com | invited |
+```
+
 ### Roles
 
 Roles are named permission sets scoped to a resource type. Built-in roles vary by resource type (for example, `workspace-admin`, `workspace-member`).
@@ -217,22 +244,29 @@ To remove this collaborator, open the TrueFoundry dashboard, go to the resource 
 
 #### Grant a User Access to a Workspace
 
-1. List roles to find the appropriate role ID (e.g., `workspace-admin` or `workspace-member`)
-2. Add the user as a collaborator on the workspace with that role
+1. Invite the user first if they do not already exist in the tenant.
+2. List roles to find the appropriate role ID (e.g., `workspace-admin` or `workspace-member`).
+3. Confirm the email, workspace, and role with the user.
+4. Add the user as a collaborator on the workspace with that role.
 
 ```bash
+# Optional: invite the user
+$TFY_API_SH POST /api/svc/v1/users/invite '{"emails":["alice@example.com"]}'
+
 # 1. Find the role ID
 $TFY_API_SH GET /api/svc/v1/roles
 
-# 2. Add collaborator
+# 2. Add collaborator after confirmation
 $TFY_API_SH POST /api/svc/v1/collaborators '{"resourceType":"workspace","resourceId":"WORKSPACE_ID","subject":"user:alice@company.com","roleId":"ROLE_ID"}'
 ```
 
 #### Create a Team and Grant Access
 
-1. Create the team
-2. Add members to the team
-3. Add the team as a collaborator on the target resource
+1. Create the team.
+2. Add members to the team.
+3. List roles and select the role ID.
+4. Confirm the team, resource, and role with the user.
+5. Add the team as a collaborator on the target resource.
 
 ```bash
 # 1. Create team
@@ -241,8 +275,21 @@ $TFY_API_SH POST /api/svc/v1/teams '{"name":"ml-engineers","description":"ML eng
 # 2. Add members (use team ID from response)
 $TFY_API_SH POST /api/svc/v1/teams/TEAM_ID/members '{"subject":"user:alice@company.com","role":"member"}'
 
-# 3. Grant team access to a workspace
+# 3. Grant team access to a workspace after confirmation
 $TFY_API_SH POST /api/svc/v1/collaborators '{"resourceType":"workspace","resourceId":"WORKSPACE_ID","subject":"team:ml-engineers","roleId":"ROLE_ID"}'
+```
+
+#### Create a Custom Role and Grant It to a Team
+
+1. Define the role name, resource type, and permission list.
+2. Create the role.
+3. Create or select the team.
+4. Confirm the final subject/resource/role binding.
+5. Add the team as a collaborator.
+
+```bash
+$TFY_API_SH POST /api/svc/v1/roles '{"name":"custom-deployer","displayName":"Custom Deployer","description":"Can deploy apps","resourceType":"workspace","permissions":["deploy:create","deploy:read"]}'
+$TFY_API_SH POST /api/svc/v1/collaborators '{"resourceType":"workspace","resourceId":"WORKSPACE_ID","subject":"team:ml-engineers","roleId":"ROLE_ID_FROM_RESPONSE"}'
 ```
 
 #### Audit Access on a Resource

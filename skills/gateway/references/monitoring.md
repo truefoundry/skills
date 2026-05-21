@@ -1,6 +1,6 @@
-# AI Monitoring & Traces
+# AI Monitoring & Metrics
 
-Query gateway request traces, costs, latency, errors, and token usage via the spans query API.
+Query gateway request traces, costs, latency, errors, and token usage. Use the spans API for request-level investigations and the metrics API for aggregate questions such as "show cost for the last 3 months."
 
 ### Required Parameter
 
@@ -28,6 +28,38 @@ $TFY_API_SH POST '/api/svc/v1/spans/query' '{
 }'
 ```
 
+### Metrics API
+
+**Endpoint:** `POST /api/svc/v1/llm-gateway/metrics/query`
+
+Use this API for aggregate gateway questions. Calculate `startTs` and `endTs` from the user's requested time range. If the user says "last 3 months", use the exact three-month window ending now unless they ask for calendar months.
+
+```bash
+$TFY_API_SH POST '/api/svc/v1/llm-gateway/metrics/query' '{
+  "startTs": "2026-02-20T00:00:00.000Z",
+  "endTs": "2026-05-20T00:00:00.000Z",
+  "datasource": "modelMetrics",
+  "type": "distribution",
+  "aggregations": [
+    {"type": "count", "column": "costInUSD"},
+    {"type": "sum", "column": "costInUSD"},
+    {"type": "sum", "column": "inputTokens"},
+    {"type": "sum", "column": "outputTokens"},
+    {"type": "p50", "column": "latencyMs"},
+    {"type": "p90", "column": "latencyMs"}
+  ],
+  "groupBy": ["modelName"]
+}'
+```
+
+Available aggregation columns: `costInUSD`, `inputTokens`, `outputTokens`, `latencyMs`, `interTokenLatencyMs`, `timeToFirstTokenMs`, `timePerOutputTokenLatencyMs`
+
+Aggregation types: `count`, `sum`, `p50`, `p75`, `p90`, `p99`
+
+Group-by dimensions: `modelName`, `userEmail`, `virtualaccount`, `team`, `virtualModel`, `errorCode`, `requestType`, `providerAccountType`, `providerModelName`, `metadata.<key>`
+
+For calendar-month cost breakdowns, run one metrics query per month. Do not invent a month group-by unless the API response or product docs expose one.
+
 ### Common Monitoring Use Cases
 
 #### 1. Show Recent Requests
@@ -41,7 +73,7 @@ $TFY_API_SH POST '/api/svc/v1/spans/query' '{
 }'
 ```
 
-#### 2. Cost Analysis (LLM Spans)
+#### 2. Cost Analysis (Request-Level LLM Spans)
 
 Filter for LLM spans and extract cost attributes:
 
@@ -50,7 +82,7 @@ $TFY_API_SH POST '/api/svc/v1/spans/query' '{
   "startTime": "2026-03-26T00:00:00.000Z",
   "dataRoutingDestination": "default",
   "filters": [
-    {"spanAttributeKey": "tfy.span_type", "operator": "eq", "value": "LLM"}
+    {"spanAttributeKey": "tfy.span_type", "operator": "EQUAL", "value": "LLM"}
   ],
   "limit": 200,
   "sortDirection": "desc"
@@ -69,7 +101,7 @@ $TFY_API_SH POST '/api/svc/v1/spans/query' '{
   "startTime": "2026-03-26T00:00:00.000Z",
   "dataRoutingDestination": "default",
   "filters": [
-    {"spanFieldName": "statusCode", "operator": "eq", "value": "ERROR"}
+    {"spanFieldName": "statusCode", "operator": "EQUAL", "value": "ERROR"}
   ],
   "limit": 50,
   "sortDirection": "desc"
@@ -85,7 +117,7 @@ $TFY_API_SH POST '/api/svc/v1/spans/query' '{
   "startTime": "2026-03-26T00:00:00.000Z",
   "dataRoutingDestination": "default",
   "filters": [
-    {"spanAttributeKey": "tfy.span_type", "operator": "eq", "value": "LLM"}
+    {"spanAttributeKey": "tfy.span_type", "operator": "EQUAL", "value": "LLM"}
   ],
   "limit": 200,
   "sortDirection": "desc"
@@ -125,7 +157,7 @@ $TFY_API_SH POST '/api/svc/v1/spans/query' '{
   "startTime": "2026-03-26T00:00:00.000Z",
   "dataRoutingDestination": "default",
   "filters": [
-    {"spanAttributeKey": "tfy.span_type", "operator": "eq", "value": "MCP"}
+    {"spanAttributeKey": "tfy.span_type", "operator": "EQUAL", "value": "MCP"}
   ],
   "limit": 50,
   "sortDirection": "desc"
@@ -153,7 +185,7 @@ $TFY_API_SH POST '/api/svc/v1/spans/query' '{
   "startTime": "2026-03-26T00:00:00.000Z",
   "dataRoutingDestination": "default",
   "filters": [
-    {"spanFieldName": "spanName", "operator": "contains", "value": "completions"}
+    {"spanFieldName": "spanName", "operator": "STRING_CONTAINS", "value": "completions"}
   ],
   "limit": 50,
   "sortDirection": "desc"
@@ -167,7 +199,7 @@ $TFY_API_SH POST '/api/svc/v1/spans/query' '{
   "startTime": "2026-03-26T00:00:00.000Z",
   "dataRoutingDestination": "default",
   "filters": [
-    {"gatewayRequestMetadataKey": "tfy_gateway_region", "operator": "eq", "value": "US"}
+    {"gatewayRequestMetadataKey": "tfy_gateway_region", "operator": "EQUAL", "value": "US"}
   ],
   "limit": 50,
   "sortDirection": "desc"
@@ -222,7 +254,62 @@ Custom metadata keys set via `X-TFY-LOGGING-CONFIG` headers.
 
 #### Filter Operators
 
-`eq`, `neq`, `contains`, `not_contains`, `starts_with`, `ends_with`
+`EQUAL`, `IN`, `NOT_IN`, `STRING_CONTAINS`, `STRING_STARTS_WITH`, `STRING_ENDS_WITH`, `GREATER_THAN`, `LESS_THAN`
+
+### Aggregate Cost Recipes
+
+#### Total Cost for a Time Range
+
+```bash
+$TFY_API_SH POST '/api/svc/v1/llm-gateway/metrics/query' '{
+  "startTs": "2026-02-20T00:00:00.000Z",
+  "endTs": "2026-05-20T00:00:00.000Z",
+  "datasource": "modelMetrics",
+  "type": "distribution",
+  "aggregations": [
+    {"type": "count", "column": "costInUSD"},
+    {"type": "sum", "column": "costInUSD"},
+    {"type": "sum", "column": "inputTokens"},
+    {"type": "sum", "column": "outputTokens"}
+  ]
+}'
+```
+
+#### Cost by Model
+
+Use the same body and add:
+
+```json
+"groupBy": ["modelName"]
+```
+
+#### Cost by User, Team, or Virtual Account
+
+Use one of these groupings:
+
+```json
+"groupBy": ["userEmail"]
+"groupBy": ["team"]
+"groupBy": ["virtualaccount"]
+```
+
+#### Error or Latency Summary
+
+```bash
+$TFY_API_SH POST '/api/svc/v1/llm-gateway/metrics/query' '{
+  "startTs": "2026-02-20T00:00:00.000Z",
+  "endTs": "2026-05-20T00:00:00.000Z",
+  "datasource": "modelMetrics",
+  "type": "distribution",
+  "aggregations": [
+    {"type": "count", "column": "costInUSD"},
+    {"type": "p50", "column": "latencyMs"},
+    {"type": "p90", "column": "latencyMs"},
+    {"type": "p99", "column": "latencyMs"}
+  ],
+  "groupBy": ["errorCode"]
+}'
+```
 
 ### Response Structure
 

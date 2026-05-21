@@ -19,9 +19,10 @@ Platform setup and access management: verify credentials, discover workspaces an
 - Verify TrueFoundry credentials and connectivity (preflight check)
 - List clusters, workspaces, GPU types, or base domains
 - Find workspace FQNs for deployment targets
+- Invite users by email
 - List or create roles, teams, or collaborators
 - Manage secret groups and secret references (`tfy-secret://`)
-- List and create personal access tokens (PATs)
+- List and create personal access tokens (PATs) and virtual accounts (VATs)
 
 ## When NOT to Use
 
@@ -96,6 +97,7 @@ Manage roles, teams, and collaborators. For full API calls, tool call syntax, pr
 
 | Action | API Call |
 |--------|---------|
+| Invite user | `$TFY_API_SH POST /api/svc/v1/users/invite '{...}'` |
 | List roles | `$TFY_API_SH GET /api/svc/v1/roles` |
 | List teams | `$TFY_API_SH GET /api/svc/v1/teams` |
 | List collaborators | `$TFY_API_SH GET '/api/svc/v1/collaborators?resourceType=TYPE&resourceId=ID'` |
@@ -108,6 +110,19 @@ Subject format: `user:email`, `team:slug`, `serviceaccount:name`, `virtualaccoun
 > **Security:** Confirm subject, role, and resource with the user before granting access.
 
 Destructive operations (delete roles, teams, collaborators): direct to dashboard.
+
+### Invite Users
+
+Use this for "invite new users by email" requests.
+
+1. Collect email addresses.
+2. Confirm target tenant.
+3. Ask whether to only invite or also grant access to a resource.
+4. If granting access, list roles/resources first and ask for explicit confirmation.
+
+```bash
+$TFY_API_SH POST /api/svc/v1/users/invite '{"emails":["alice@example.com"]}'
+```
 
 ## Secrets
 
@@ -129,18 +144,24 @@ For full create/update flows, API patterns, and security policies, see [referenc
 
 ## Access Tokens
 
-List and create PATs. Token values are shown only once at creation.
+List and create PATs and manage virtual accounts/VATs. Token values are shown only once at creation or retrieval/regeneration time.
 
 | Action | API Call |
 |--------|---------|
 | List PATs | `$TFY_API_SH GET /api/svc/v1/personal-access-tokens` |
 | Create PAT | `$TFY_API_SH POST /api/svc/v1/personal-access-tokens '{"name":"..."}'` |
+| List virtual accounts | `$TFY_API_SH GET /api/svc/v1/virtual-accounts` |
+| Create/update virtual account | `$TFY_API_SH POST /api/svc/v1/virtual-accounts '{...}'` |
+| Get VAT token | `$TFY_API_SH GET /api/svc/v1/virtual-accounts/ID/token` |
+| Regenerate VAT token | `$TFY_API_SH POST /api/svc/v1/virtual-accounts/ID/regenerate-token` |
 
 > **Security:** Never repeat, store, or log token values. Show masked preview by default; full value only on explicit confirmation.
 
 For full token display policy and security rules, see [references/secrets-and-tokens.md](references/secrets-and-tokens.md).
 
 Deletion: direct to dashboard.
+
+Service accounts: this skill can grant roles to existing service account subjects using `serviceaccount:name`. Do not claim service-account creation is supported until the create endpoint or dashboard flow is verified.
 
 </instructions>
 
