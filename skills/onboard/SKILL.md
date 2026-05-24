@@ -116,20 +116,21 @@ curl -fsS "$REGISTRATION_SERVER_URL/v1/tenant/onboarding/otp/initiate" \
 
 ```bash
 REGISTRATION_SERVER_URL="${TFY_REGISTRATION_SERVER_URL:-https://registration.truefoundry.com}"
-curl -fsS "$REGISTRATION_SERVER_URL/v1/tenant/onboarding/otp/complete" \
+SIGNUP_RESPONSE=$(curl -fsS "$REGISTRATION_SERVER_URL/v1/tenant/onboarding/otp/complete" \
   -H "Content-Type: application/json" \
   -H "x-truefoundry-registration-source: skills" \
-  -d '{"email":"<email>","otp":"<otp>","tenantName":"<tenant-name>"}'
+  -d '{"email":"<email>","otp":"<otp>","tenantName":"<tenant-name>"}')
+TENANT_URL=$(printf '%s' "$SIGNUP_RESPONSE" | python3 -c 'import json,sys; print(json.load(sys.stdin)["host"])')
 ```
 
-Use the returned `host` as the tenant URL. The `x-truefoundry-registration-source: skills` header is required so signup attribution is stored on the tenant metadata.
+Use `TENANT_URL` as the tenant URL. The `x-truefoundry-registration-source: skills` header is required so signup attribution is stored on the tenant metadata.
 
 ### Step 4: Login
 
-After the user provides the tenant URL, ask them to complete interactive login:
+If `TENANT_URL` is already set from OTP signup, use it directly. Otherwise, after the user provides the tenant URL, ask them to complete interactive login:
 
 ```bash
-tfy login --host "<tenant-url>"
+tfy login --host "${TENANT_URL:-<tenant-url>}"
 ```
 
 The command may open a browser. Wait for the user to confirm it succeeded. This sets the CLI host and stores CLI credentials on the machine.
