@@ -2,8 +2,8 @@
 name: truefoundry-onboard
 description: First-time TrueFoundry setup. Handles tenant registration, CLI installation, tfy login, and login verification. Use when no TrueFoundry credentials exist or when other skills report missing login.
 license: MIT
-compatibility: Requires Bash, Python 3, and the tfy CLI
-allowed-tools: Bash(tfy*) Bash(pip*) Bash(uv*) Bash(python*) Bash(cat*) Bash(mkdir*)
+compatibility: Requires Bash, Python 3, curl, and the tfy CLI
+allowed-tools: Bash(tfy*) Bash(pip*) Bash(uv*) Bash(python*) Bash(cat*) Bash(mkdir*) Bash(curl*)
 ---
 
 <objective>
@@ -81,22 +81,48 @@ PY
 
 If login is already present, tell the user the tenant host and stop. The next requested TrueFoundry skill can continue.
 
-### Step 3: Get Tenant URL If Login Is Missing
+### Step 3: Create Or Get Tenant URL If Login Is Missing
 
 If the login check prints `tfy login: missing`, say:
 
 ```text
 Looks like the tenant is not set or CLI login is not done.
-If you have not already, create an account at https://www.truefoundry.com/register, complete the onboarding/signup flow, and paste your tenant URL here.
+If you already have a TrueFoundry tenant URL, paste it here.
+If not, I can create one with email OTP from this session.
 ```
 
-Accept a full tenant URL, for example:
+If the user has a tenant URL, accept a full tenant URL, for example:
 
 ```text
 https://acme.truefoundry.cloud
 ```
 
-Use browser registration only for new tenants.
+If the user wants to create a tenant from this session:
+
+1. Ask for their email and desired tenant name.
+2. Use `https://registration.truefoundry.com` as the registration server base URL, unless `TFY_REGISTRATION_SERVER_URL` is set.
+3. Initiate OTP:
+
+```bash
+REGISTRATION_SERVER_URL="${TFY_REGISTRATION_SERVER_URL:-https://registration.truefoundry.com}"
+curl -fsS "$REGISTRATION_SERVER_URL/v1/tenant/onboarding/otp/initiate" \
+  -H "Content-Type: application/json" \
+  -H "x-truefoundry-registration-source: skills" \
+  -d '{"email":"<email>"}'
+```
+
+4. Ask the user to paste the OTP from email.
+5. Complete signup:
+
+```bash
+REGISTRATION_SERVER_URL="${TFY_REGISTRATION_SERVER_URL:-https://registration.truefoundry.com}"
+curl -fsS "$REGISTRATION_SERVER_URL/v1/tenant/onboarding/otp/complete" \
+  -H "Content-Type: application/json" \
+  -H "x-truefoundry-registration-source: skills" \
+  -d '{"email":"<email>","otp":"<otp>","tenantName":"<tenant-name>"}'
+```
+
+Use the returned `host` as the tenant URL. The `x-truefoundry-registration-source: skills` header is required so signup attribution is stored on the tenant metadata.
 
 ### Step 4: Login
 
